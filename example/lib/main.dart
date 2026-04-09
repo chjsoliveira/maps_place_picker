@@ -269,7 +269,7 @@ class _HomePageState extends State<HomePage> {
                         zoomControlsEnabled: false,
                         myLocationButtonEnabled: false,
                         mapToolbarEnabled: false,
-                        initialCameraPosition: new CameraPosition(
+                        initialCameraPosition: CameraPosition(
                             target: HomePage.kInitialPosition, zoom: 15),
                         mapType: MapType.normal,
                         myLocationEnabled: true,

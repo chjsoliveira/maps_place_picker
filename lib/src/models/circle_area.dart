@@ -13,8 +13,8 @@ class CircleArea extends Circle {
           circleId: CircleId(const Uuid().v4()),
           center: center,
           radius: radius,
-          fillColor: fillColor ?? Colors.blue.withAlpha(32),
-          strokeColor: strokeColor ?? Colors.blue.withAlpha(192),
+          fillColor: fillColor ?? Colors.blue.withValues(alpha: 32 / 255.0),
+          strokeColor: strokeColor ?? Colors.blue.withValues(alpha: 192 / 255.0),
           strokeWidth: strokeWidth,
         );
 }

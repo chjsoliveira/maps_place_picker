@@ -247,4 +247,14 @@ class PlaceProvider extends ChangeNotifier {
     if (_mapType == MapType.none) _mapType = MapType.normal;
     notifyListeners();
   }
+
+  /// `true` when the initial search triggered by [selectInitialPosition] is
+  /// still pending (waiting for the first [onCameraIdle] after map creation).
+  bool pendingInitialSearch = false;
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
 }

@@ -105,6 +105,12 @@ class GoogleMapPlacePicker extends StatelessWidget {
   final bool fullMotion;
 
   _searchByCameraLocation(PlaceProvider provider) async {
+    // Guard: map must be ready before searching.
+    if (provider.mapController == null) {
+      provider.placeSearchingState = SearchingState.Idle;
+      return;
+    }
+
     // We don't want to search location again if camera location is changed by zooming in/out.
     if (forceSearchOnZoomChanged == false &&
         provider.prevCameraPosition != null &&
@@ -221,14 +227,22 @@ class GoogleMapPlacePicker extends StatelessWidget {
         provider.setCameraPosition(null);
         provider.pinState = PinState.Idle;
 
-        // When select initialPosition set to true.
+        // When selectInitialPosition is true, defer the search until the
+        // first onCameraIdle so the camera has fully settled on the initial
+        // position (fixes upstream issue #175).
         if (selectInitialPosition!) {
-          provider.setCameraPosition(initialCameraPosition);
-          _searchByCameraLocation(provider);
+          provider.pendingInitialSearch = true;
         }
         onMapCreated?.call(controller);
       },
       onCameraIdle: () {
+        // Trigger the deferred initial-position search on the first idle.
+        if (provider.pendingInitialSearch) {
+          provider.pendingInitialSearch = false;
+          _searchByCameraLocation(provider);
+          return;
+        }
+
         if (provider.isAutoCompleteSearching) {
           provider.isAutoCompleteSearching = false;
           provider.pinState = PinState.Idle;
@@ -257,13 +271,16 @@ class GoogleMapPlacePicker extends StatelessWidget {
         provider.setPrevCameraPosition(provider.cameraPosition);
         // Cancel any other timer.
         provider.debounceTimer?.cancel();
-        // Update state, dismiss keyboard and clear text.
-        provider.pinState = PinState.Dragging;
-        // Begins the search state if the hide details is enabled
-        if (this.hidePlaceDetailsWhenDraggingPin!) {
-          provider.placeSearchingState = SearchingState.Searching;
+        // Only mark as dragging for genuine user gestures, not for the
+        // programmatic camera animation triggered by autocomplete (B8).
+        if (!provider.isAutoCompleteSearching) {
+          provider.pinState = PinState.Dragging;
+          // Begins the search state if the hide details is enabled
+          if (this.hidePlaceDetailsWhenDraggingPin!) {
+            provider.placeSearchingState = SearchingState.Searching;
+          }
+          onMoveStart?.call();
         }
-        onMoveStart?.call();
       },
       onCameraMove: (CameraPosition position) {
         provider.setCameraPosition(position);
@@ -271,6 +288,8 @@ class GoogleMapPlacePicker extends StatelessWidget {
       },
       // gestureRecognizers make it possible to navigate the map when it's a
       // child in a scroll view e.g ListView, SingleChildScrollView...
+      // TODO(D6): re-evaluate whether EagerGestureRecognizer is still required
+      // after google_maps_flutter ≥2.12.1 — it may have been fixed upstream.
       gestureRecognizers: <Factory<EagerGestureRecognizer>>{
         Factory<EagerGestureRecognizer>(() => EagerGestureRecognizer()),
       },
@@ -568,33 +587,49 @@ class GoogleMapPlacePicker extends StatelessWidget {
       child: Column(
         children: <Widget>[
           enableMapTypeButton!
-              ? Container(
+              ? SizedBox(
                   width: 35,
                   height: 35,
-                  child: RawMaterialButton(
-                    shape: CircleBorder(),
-                    fillColor: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.black54
-                        : Colors.white,
-                    elevation: 4.0,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: const CircleBorder(),
+                      backgroundColor:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black54
+                              : Colors.white,
+                      foregroundColor:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black87,
+                      elevation: 4.0,
+                      padding: EdgeInsets.zero,
+                    ),
                     onPressed: onToggleMapType,
-                    child: Icon(Icons.layers),
+                    child: const Icon(Icons.layers),
                   ),
                 )
               : Container(),
           SizedBox(height: 10),
           enableMyLocationButton!
-              ? Container(
+              ? SizedBox(
                   width: 35,
                   height: 35,
-                  child: RawMaterialButton(
-                    shape: CircleBorder(),
-                    fillColor: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.black54
-                        : Colors.white,
-                    elevation: 4.0,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: const CircleBorder(),
+                      backgroundColor:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black54
+                              : Colors.white,
+                      foregroundColor:
+                          Theme.of(context).brightness == Brightness.dark
+                              ? Colors.white
+                              : Colors.black87,
+                      elevation: 4.0,
+                      padding: EdgeInsets.zero,
+                    ),
                     onPressed: onMyLocation,
-                    child: Icon(Icons.my_location),
+                    child: const Icon(Icons.my_location),
                   ),
                 )
               : Container(),

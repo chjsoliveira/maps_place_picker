@@ -220,7 +220,9 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
 
   _clearOverlay() {
     if (overlayEntry != null) {
-      overlayEntry!.remove();
+      try {
+        overlayEntry!.remove();
+      } catch (_) {}
       overlayEntry = null;
     }
   }
