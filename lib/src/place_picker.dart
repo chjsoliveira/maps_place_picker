@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_api_headers/google_api_headers.dart';
@@ -427,6 +428,12 @@ class _PlacePickerState extends State<PlacePicker> {
 
       provider!.selectedPlace =
           PickResult.fromPlaceDetailResult(response.result);
+
+      // V2: validate geometry before attempting to animate the camera.
+      if (provider!.selectedPlace?.geometry == null) {
+        debugPrint("Place detail result has no geometry — cannot move camera.");
+        return;
+      }
 
       // Prevents searching again by camera movement.
       provider!.isAutoCompleteSearching = true;

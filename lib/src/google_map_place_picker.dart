@@ -153,10 +153,18 @@ class GoogleMapPlacePicker extends StatelessWidget {
       return;
     }
 
+    // V2: validate that the result has usable geometry before proceeding.
+    final firstResult = response.results[0];
+    if (firstResult.geometry == null) {
+      debugPrint("Camera Location Search: result has no geometry, skipping.");
+      provider.placeSearchingState = SearchingState.Idle;
+      return;
+    }
+
     if (usePlaceDetailSearch!) {
       final PlacesDetailsResponse detailResponse =
           await provider.places.getDetailsByPlaceId(
-        response.results[0].placeId,
+        firstResult.placeId,
         language: language,
       );
 
@@ -171,11 +179,16 @@ class GoogleMapPlacePicker extends StatelessWidget {
         return;
       }
 
-      provider.selectedPlace =
-          PickResult.fromPlaceDetailResult(detailResponse.result);
+      // V2: validate detail result geometry.
+      if (detailResponse.result.geometry == null) {
+        debugPrint("Place detail result has no geometry, falling back to geocoding result.");
+        provider.selectedPlace = PickResult.fromGeocodingResult(firstResult);
+      } else {
+        provider.selectedPlace =
+            PickResult.fromPlaceDetailResult(detailResponse.result);
+      }
     } else {
-      provider.selectedPlace =
-          PickResult.fromGeocodingResult(response.results[0]);
+      provider.selectedPlace = PickResult.fromGeocodingResult(firstResult);
     }
 
     provider.placeSearchingState = SearchingState.Idle;
@@ -289,7 +302,8 @@ class GoogleMapPlacePicker extends StatelessWidget {
       // gestureRecognizers make it possible to navigate the map when it's a
       // child in a scroll view e.g ListView, SingleChildScrollView...
       // TODO(D6): re-evaluate whether EagerGestureRecognizer is still required
-      // after google_maps_flutter ≥2.12.1 — it may have been fixed upstream.
+      // with google_maps_flutter ^2.12.1 (current constraint in pubspec.yaml) —
+      // the nested scroll-view workaround may have been resolved upstream.
       gestureRecognizers: <Factory<EagerGestureRecognizer>>{
         Factory<EagerGestureRecognizer>(() => EagerGestureRecognizer()),
       },
@@ -497,14 +511,17 @@ class GoogleMapPlacePicker extends StatelessWidget {
   }
 
   Widget _buildSelectionDetails(BuildContext context, PickResult result) {
+    // B9: guard against null geometry (can happen when usePlaceDetailSearch=false
+    // and the geocoding API returns a result without geometry).
     bool canBePicked = pickArea == null ||
         pickArea!.radius <= 0 ||
-        Geolocator.distanceBetween(
-                pickArea!.center.latitude,
-                pickArea!.center.longitude,
-                result.geometry!.location.lat,
-                result.geometry!.location.lng) <=
-            pickArea!.radius;
+        (result.geometry != null &&
+            Geolocator.distanceBetween(
+                    pickArea!.center.latitude,
+                    pickArea!.center.longitude,
+                    result.geometry!.location.lat,
+                    result.geometry!.location.lng) <=
+                pickArea!.radius);
     WidgetStateColor buttonColor = WidgetStateColor.resolveWith(
         (states) => canBePicked ? Colors.lightGreen : Colors.red);
     return Container(
@@ -512,7 +529,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Text(
-            result.formattedAddress!,
+            result.formattedAddress ?? 'Address unavailable',
             style: TextStyle(fontSize: 18),
             textAlign: TextAlign.center,
           ),
