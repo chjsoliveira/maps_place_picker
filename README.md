@@ -6,7 +6,7 @@ This is an actively maintained fork based on [google_maps_place_picker_mb](https
 
 ## Preview
 
-![Place Picker Preview](https://raw.githubusercontent.com/fysoul17/google_maps_place_picker/master/preview.gif)
+![Place Picker Preview](doc/preview.gif)
 
 ## Features
 
