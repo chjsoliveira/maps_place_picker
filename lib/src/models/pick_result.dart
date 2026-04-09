@@ -1,6 +1,18 @@
-import 'package:flutter_google_maps_webservices/geocoding.dart';
-import 'package:flutter_google_maps_webservices/places.dart';
+import 'package:maps_place_picker/src/models/address_component.dart';
+import 'package:maps_place_picker/src/models/geometry.dart';
+import 'package:maps_place_picker/src/models/geocoding_result.dart';
+import 'package:maps_place_picker/src/models/place_details.dart';
 
+export 'package:maps_place_picker/src/models/address_component.dart';
+export 'package:maps_place_picker/src/models/geometry.dart';
+export 'package:maps_place_picker/src/models/place_details.dart';
+
+/// The result returned when the user picks a location in [PlacePicker].
+///
+/// When [PlacePicker.usePlaceDetailSearch] is `false` (the default), only
+/// [placeId], [geometry], [formattedAddress], [types], and
+/// [addressComponents] are populated. All other fields require
+/// `usePlaceDetailSearch: true`.
 class PickResult {
   PickResult({
     this.placeId,
@@ -10,19 +22,14 @@ class PickResult {
     this.addressComponents,
     this.adrAddress,
     this.formattedPhoneNumber,
-    this.id,
-    this.reference,
-    this.icon,
     this.name,
     this.openingHours,
     this.photos,
     this.internationalPhoneNumber,
     this.priceLevel,
     this.rating,
-    this.scope,
     this.url,
     this.vicinity,
-    this.utcOffset,
     this.website,
     this.reviews,
   });
@@ -33,35 +40,51 @@ class PickResult {
   final List<String>? types;
   final List<AddressComponent>? addressComponents;
 
-  // Below results will not be fetched if 'usePlaceDetailSearch' is set to false (Defaults to false).
+  // The fields below are only populated when usePlaceDetailSearch = true.
+
   final String? adrAddress;
   final String? formattedPhoneNumber;
-  final String? id;
-  final String? reference;
-  final String? icon;
   final String? name;
   final OpeningHoursDetail? openingHours;
   final List<Photo>? photos;
   final String? internationalPhoneNumber;
   final PriceLevel? priceLevel;
   final num? rating;
-  final String? scope;
   final String? url;
   final String? vicinity;
-  final num? utcOffset;
   final String? website;
   final List<Review>? reviews;
 
-  factory PickResult.fromGeocodingResult(GeocodingResult result) {
+  /// Creates a [PickResult] from a reverse-geocoding [GeocodingResult].
+  ///
+  /// [cameraLat] and [cameraLng] are the exact pin position from the map
+  /// camera. They are used as the authoritative coordinates (B16 fix: the
+  /// geocoding result may return a centroid that does not match the pin in
+  /// rural / low-density areas).
+  factory PickResult.fromGeocodingResult(
+    GeocodingResult result, {
+    double? cameraLat,
+    double? cameraLng,
+  }) {
+    final Geometry? resolvedGeometry = (cameraLat != null && cameraLng != null)
+        ? Geometry.fromCameraAndGeocoding(
+            lat: cameraLat,
+            lng: cameraLng,
+            viewport: result.geometry?.viewport,
+          )
+        : result.geometry;
+
     return PickResult(
       placeId: result.placeId,
-      geometry: result.geometry,
+      geometry: resolvedGeometry,
       formattedAddress: result.formattedAddress,
       types: result.types,
       addressComponents: result.addressComponents,
     );
   }
 
+  /// Creates a [PickResult] from a [PlaceDetails] response (used when
+  /// [PlacePicker.usePlaceDetailSearch] is `true`).
   factory PickResult.fromPlaceDetailResult(PlaceDetails result) {
     return PickResult(
       placeId: result.placeId,
@@ -71,19 +94,14 @@ class PickResult {
       addressComponents: result.addressComponents,
       adrAddress: result.adrAddress,
       formattedPhoneNumber: result.formattedPhoneNumber,
-      id: result.id,
-      reference: result.reference,
-      icon: result.icon,
       name: result.name,
       openingHours: result.openingHours,
       photos: result.photos,
       internationalPhoneNumber: result.internationalPhoneNumber,
       priceLevel: result.priceLevel,
       rating: result.rating,
-      scope: result.scope,
       url: result.url,
       vicinity: result.vicinity,
-      utcOffset: result.utcOffset,
       website: result.website,
       reviews: result.reviews,
     );

@@ -6,7 +6,9 @@ import 'package:maps_place_picker/providers/place_provider.dart';
 import 'package:maps_place_picker/providers/search_provider.dart';
 import 'package:maps_place_picker/src/components/prediction_tile.dart';
 import 'package:maps_place_picker/src/controllers/autocomplete_search_controller.dart';
-import 'package:flutter_google_maps_webservices/places.dart';
+import 'package:maps_place_picker/src/models/component.dart';
+import 'package:maps_place_picker/src/models/prediction.dart';
+import 'package:maps_place_picker/src/services/places_service.dart';
 import 'package:provider/provider.dart';
 
 class AutoCompleteSearch extends StatefulWidget {
@@ -231,24 +233,30 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
     _clearOverlay();
 
     final RenderBox? appBarRenderBox =
-        widget.appBarKey.currentContext!.findRenderObject() as RenderBox?;
-    final translation = appBarRenderBox?.getTransformTo(null).getTranslation();
-    final Offset offset = translation != null
-        ? Offset(translation.x, translation.y)
-        : Offset(0.0, 0.0);
-    final screenWidth = MediaQuery.of(context).size.width;
+        widget.appBarKey.currentContext?.findRenderObject() as RenderBox?;
+    if (appBarRenderBox == null) return;
+
+    // B10: use localToGlobal for reliable overlay positioning in all layouts.
+    final Offset topLeft = appBarRenderBox.localToGlobal(Offset.zero);
+    final double overlayTop = topLeft.dy + appBarRenderBox.size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
 
     overlayEntry = OverlayEntry(
-      builder: (context) => Positioned(
-        top: appBarRenderBox!.paintBounds.shift(offset).top +
-            appBarRenderBox.size.height,
-        left: screenWidth * 0.025,
-        right: screenWidth * 0.025,
-        child: Material(
-          elevation: 4.0,
-          child: overlayChild,
-        ),
-      ),
+      builder: (context) {
+        // B14: keep the overlay above the on-screen keyboard.
+        final double keyboardHeight =
+            MediaQuery.of(context).viewInsets.bottom;
+        return Positioned(
+          top: overlayTop,
+          left: screenWidth * 0.025,
+          right: screenWidth * 0.025,
+          bottom: keyboardHeight,
+          child: Material(
+            elevation: 4.0,
+            child: SingleChildScrollView(child: overlayChild),
+          ),
+        );
+      },
     );
 
     Overlay.of(context).insert(overlayEntry!);
@@ -300,11 +308,8 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
           await provider.places.autocomplete(
         searchTerm,
         sessionToken: widget.sessionToken,
-        location: provider.currentPosition == null
-            ? null
-            : Location(
-                lat: provider.currentPosition!.latitude,
-                lng: provider.currentPosition!.longitude),
+        latitude: provider.currentPosition?.latitude,
+        longitude: provider.currentPosition?.longitude,
         offset: widget.autocompleteOffset,
         radius: widget.autocompleteRadius,
         language: widget.autocompleteLanguage,

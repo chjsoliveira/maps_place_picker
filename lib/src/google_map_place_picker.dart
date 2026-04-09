@@ -10,8 +10,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:maps_place_picker/maps_place_picker.dart';
 import 'package:maps_place_picker/providers/place_provider.dart';
 import 'package:maps_place_picker/src/components/animated_pin.dart';
-import 'package:flutter_google_maps_webservices/geocoding.dart';
-import 'package:flutter_google_maps_webservices/places.dart';
+import 'package:maps_place_picker/src/models/geocoding_result.dart';
+import 'package:maps_place_picker/src/services/places_service.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
@@ -130,11 +130,14 @@ class GoogleMapPlacePicker extends StatelessWidget {
 
     provider.placeSearchingState = SearchingState.Searching;
 
+    // B16: capture the exact pin position before the async geocoding call.
+    final double pinLat = provider.cameraPosition!.target.latitude;
+    final double pinLng = provider.cameraPosition!.target.longitude;
+
     final GeocodingResponse response =
         await provider.geocoding.searchByLocation(
-      Location(
-          lat: provider.cameraPosition!.target.latitude,
-          lng: provider.cameraPosition!.target.longitude),
+      pinLat,
+      pinLng,
       language: language,
     );
 
@@ -180,15 +183,25 @@ class GoogleMapPlacePicker extends StatelessWidget {
       }
 
       // V2: validate detail result geometry.
-      if (detailResponse.result.geometry == null) {
+      if (detailResponse.result?.geometry == null) {
         debugPrint("Place detail result has no geometry, falling back to geocoding result.");
-        provider.selectedPlace = PickResult.fromGeocodingResult(firstResult);
+        // B16: use the camera position as the authoritative location.
+        provider.selectedPlace = PickResult.fromGeocodingResult(
+          firstResult,
+          cameraLat: pinLat,
+          cameraLng: pinLng,
+        );
       } else {
         provider.selectedPlace =
-            PickResult.fromPlaceDetailResult(detailResponse.result);
+            PickResult.fromPlaceDetailResult(detailResponse.result!);
       }
     } else {
-      provider.selectedPlace = PickResult.fromGeocodingResult(firstResult);
+      // B16: use the exact pin position rather than the geocoding centroid.
+      provider.selectedPlace = PickResult.fromGeocodingResult(
+        firstResult,
+        cameraLat: pinLat,
+        cameraLng: pinLng,
+      );
     }
 
     provider.placeSearchingState = SearchingState.Idle;
@@ -442,34 +455,42 @@ class GoogleMapPlacePicker extends StatelessWidget {
                     IconButton(
                         icon: Icon(Icons.add),
                         onPressed: () async {
-                          double currentZoomLevel =
-                              await data.item1!.getZoomLevel();
-                          currentZoomLevel = currentZoomLevel + 2;
-                          data.item1!.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                              CameraPosition(
-                                target: data.item2!,
-                                zoom: currentZoomLevel,
+                          try {
+                            double currentZoomLevel =
+                                await data.item1!.getZoomLevel();
+                            currentZoomLevel = currentZoomLevel + 2;
+                            await data.item1!.animateCamera(
+                              CameraUpdate.newCameraPosition(
+                                CameraPosition(
+                                  target: data.item2!,
+                                  zoom: currentZoomLevel,
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          } catch (e) {
+                            debugPrint('B15: animateCamera error (zoom in): $e');
+                          }
                         }),
                     SizedBox(height: 2),
                     IconButton(
                         icon: Icon(Icons.remove),
                         onPressed: () async {
-                          double currentZoomLevel =
-                              await data.item1!.getZoomLevel();
-                          currentZoomLevel = currentZoomLevel - 2;
-                          if (currentZoomLevel < 0) currentZoomLevel = 0;
-                          data.item1!.animateCamera(
-                            CameraUpdate.newCameraPosition(
-                              CameraPosition(
-                                target: data.item2!,
-                                zoom: currentZoomLevel,
+                          try {
+                            double currentZoomLevel =
+                                await data.item1!.getZoomLevel();
+                            currentZoomLevel = currentZoomLevel - 2;
+                            if (currentZoomLevel < 0) currentZoomLevel = 0;
+                            await data.item1!.animateCamera(
+                              CameraUpdate.newCameraPosition(
+                                CameraPosition(
+                                  target: data.item2!,
+                                  zoom: currentZoomLevel,
+                                ),
                               ),
-                            ),
-                          );
+                            );
+                          } catch (e) {
+                            debugPrint('B15: animateCamera error (zoom out): $e');
+                          }
                         }),
                   ],
                 ),

@@ -5,8 +5,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:maps_place_picker/src/models/pick_result.dart';
 import 'package:maps_place_picker/src/place_picker.dart';
-import 'package:flutter_google_maps_webservices/geocoding.dart';
-import 'package:flutter_google_maps_webservices/places.dart';
+import 'package:maps_place_picker/src/services/geocoding_service.dart';
+import 'package:maps_place_picker/src/services/places_service.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 
@@ -30,13 +30,13 @@ class PlaceProvider extends ChangeNotifier {
     Client? httpClient,
     Map<String, dynamic> apiHeaders,
   ) {
-    places = GoogleMapsPlaces(
+    places = PlacesService(
       apiKey: apiKey,
       baseUrl: proxyBaseUrl,
       httpClient: httpClient,
       apiHeaders: apiHeaders.cast<String, String>(),
     );
-    geocoding = GoogleMapsGeocoding(
+    geocoding = GeocodingService(
       apiKey: apiKey,
       baseUrl: proxyBaseUrl,
       httpClient: httpClient,
@@ -48,13 +48,12 @@ class PlaceProvider extends ChangeNotifier {
   static PlaceProvider of(BuildContext context, {bool listen = true}) =>
       Provider.of<PlaceProvider>(context, listen: listen);
 
-  /// The Google Maps Places web-service client used for autocomplete and
-  /// place-detail lookups.
-  late GoogleMapsPlaces places;
+  /// The Places API (New) service used for autocomplete and place-detail
+  /// lookups.
+  late PlacesService places;
 
-  /// The Google Maps Geocoding web-service client used for reverse-geocoding
-  /// the camera position.
-  late GoogleMapsGeocoding geocoding;
+  /// The Geocoding API service used for reverse-geocoding the camera position.
+  late GeocodingService geocoding;
 
   /// Session token used to group autocomplete queries and detail fetches into
   /// a single billable session.

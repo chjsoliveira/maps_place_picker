@@ -44,30 +44,30 @@ Story point scale: 1 = trivial · 2 = simple · 3 = moderate · 5 = complex · 8
 
 ---
 
-## 📋 Sprint 3 — Backlog (≤30 SP, not yet scheduled)
+## ✅ Sprint 3 — Backlog (≤30 SP) — DONE
 
-| ID | Description | SP |
-|----|-------------|-----|
-| B10 | Autocomplete overlay offset wrong in some layouts ([upstream #159](https://github.com/fysoul17/google_maps_place_picker/issues/159)) | 3 |
-| B11 | `strictbounds` does not correctly filter results ([upstream #155](https://github.com/fysoul17/google_maps_place_picker/issues/155)) | 3 |
-| B12 | `region` filter doesn't restrict autocomplete ([upstream #164](https://github.com/fysoul17/google_maps_place_picker/issues/164)) | 3 |
-| B13 | `onMapCreated` callback not invoked ([upstream #99](https://github.com/fysoul17/google_maps_place_picker/issues/99)) | 3 |
-| B14 | Autocomplete field overlaps results / keyboard ([upstream #154](https://github.com/fysoul17/google_maps_place_picker/issues/154)) | 3 |
-| M3 | Unit tests for `PlaceProvider`, `SearchProvider`, `PickResult` | 5 |
-| M4 | Widget tests for `AutoCompleteSearch` and `GoogleMapPlacePicker` | 5 |
-| M6 | Update `flutter` + all dependencies ([upstream PR #187](https://github.com/fysoul17/google_maps_place_picker/pull/187)) | 3 |
-| **Total** | | **28** |
+| ID | Description | SP | Status |
+|----|-------------|----|----|
+| B10 | Autocomplete overlay offset wrong in some layouts ([upstream #159](https://github.com/fysoul17/google_maps_place_picker/issues/159)) | 3 | ✅ |
+| B11 | `strictbounds` does not correctly filter results ([upstream #155](https://github.com/fysoul17/google_maps_place_picker/issues/155)) | 3 | ✅ |
+| B12 | `region` filter doesn't restrict autocomplete ([upstream #164](https://github.com/fysoul17/google_maps_place_picker/issues/164)) | 3 | ✅ |
+| B13 | `onMapCreated` callback not invoked ([upstream #99](https://github.com/fysoul17/google_maps_place_picker/issues/99)) | 3 | ✅ |
+| B14 | Autocomplete field overlaps results / keyboard ([upstream #154](https://github.com/fysoul17/google_maps_place_picker/issues/154)) | 3 | ✅ |
+| M3 | Unit tests for `PlaceProvider`, `SearchProvider`, `PickResult` | 5 | ✅ |
+| M4 | Widget tests for `AutoCompleteSearch` and `GoogleMapPlacePicker` | 5 | ✅ |
+| M6 | Update `flutter` + all dependencies ([upstream PR #187](https://github.com/fysoul17/google_maps_place_picker/pull/187)) | 3 | ✅ |
+| **Total** | | **28** | |
 
 ---
 
-## 📋 Sprint 4 — Backlog (not yet scheduled)
+## ✅ Sprint 4 — DONE
 
-| ID | Description | SP |
-|----|-------------|-----|
-| D5/M1 | Migrate from `flutter_google_maps_webservices` to Places API (New) direct HTTP | 13 |
-| B15 | App crash when loading map on some devices ([upstream #96](https://github.com/fysoul17/google_maps_place_picker/issues/96)) | 5 |
-| B16 | Inaccurate coordinates in rural areas ([upstream #132](https://github.com/fysoul17/google_maps_place_picker/issues/132)) | 5 |
-| **Total** | | **23** |
+| ID | Description | SP | Status |
+|----|-------------|----|----|
+| D5/M1 | Migrate from `flutter_google_maps_webservices` to Places API (New) direct HTTP | 13 | ✅ |
+| B15 | App crash when loading map on some devices ([upstream #96](https://github.com/fysoul17/google_maps_place_picker/issues/96)) | 5 | ✅ |
+| B16 | Inaccurate coordinates in rural areas ([upstream #132](https://github.com/fysoul17/google_maps_place_picker/issues/132)) | 5 | ✅ |
+| **Total** | | **23** | |
 
 ---
 
