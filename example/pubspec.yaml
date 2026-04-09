@@ -1,0 +1,29 @@
+name: maps_place_picker_demo
+description: Maps Place Picker demo
+
+version: 1.0.0+1
+
+publish_to: none
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+  flutter: ">=3.22.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.6
+
+  maps_place_picker:
+    path: ../
+
+  google_maps_flutter_android: ^2.14.5
+  google_maps_flutter_platform_interface: ^2.9.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
