@@ -1,3 +1,40 @@
+## [1.1.0] - 09/Apr/2026 — Sprint 3 & 4
+
+### ⚠️ Breaking changes
+- **Removed** `flutter_google_maps_webservices` dependency. Consumers who imported
+  types such as `Geometry`, `AddressComponent`, `Prediction`, or `Component` directly
+  from that package should now import them from `maps_place_picker` instead.
+- `PickResult` fields `id`, `reference`, `icon`, `scope`, and `utcOffset` have been
+  removed. These mapped to deprecated Places API v1 fields that have no equivalent in
+  the Places API (New). Rename `name` → `name` (unchanged), `website` → `website`
+  (unchanged), `url` → `url` (now `googleMapsUri`).
+
+### New features / improvements
+- **D5/M1** Replaced unmaintained `flutter_google_maps_webservices` with direct HTTP
+  calls to the **Places API (New)** (`https://places.googleapis.com/v1/`) and the
+  **Geocoding API**. No external wrapper package is required.
+- **B11** `strictbounds: true` now correctly uses `locationRestriction` (hard boundary)
+  in the Places API (New) request instead of being silently ignored.
+- **B12** `region` is now sent as `regionCode` to the New API, providing proper
+  result biasing by CLDR region code.
+- **B10** Fixed autocomplete overlay offset calculation in non-standard layouts by
+  using `localToGlobal` instead of `paintBounds + getTransformTo`.
+- **B14** Autocomplete results overlay no longer overlaps the on-screen keyboard;
+  it is constrained above it via `MediaQuery.viewInsets.bottom`.
+- **B15** `animateCamera` calls are now wrapped in try-catch to prevent crashes on
+  devices where the map controller is not yet fully initialised (upstream #96).
+- **B16** The `PickResult.geometry.location` now reflects the exact pin position
+  (camera target) rather than the geocoding centroid, fixing inaccurate coordinates
+  in rural / low-density areas (upstream #132).
+- **B13** `onMapCreated` callback forwarding verified; no change needed — it was
+  already correctly forwarded through the widget hierarchy.
+- **M3** Added unit tests for models (`Geometry`, `Location`, `AddressComponent`,
+  `Prediction`, `MatchedSubstring`, `GeocodingResult`, `PriceLevel`),
+  `PickResult` factory methods, `SearchProvider`, and service layer.
+- **M4** Unit tests cover `PlacesService` and `GeocodingService` HTTP behaviour
+  including error cases, `strictbounds` routing, and `regionCode` mapping.
+- **M6** Updated `http` to `^1.2.0`, `provider` to `^6.1.2`, `uuid` to `^4.5.1`.
+
 ## [1.0.0] - 09/Apr/2026
 
 - Initial release as `maps_place_picker`

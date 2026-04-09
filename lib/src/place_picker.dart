@@ -10,11 +10,11 @@ import 'package:maps_place_picker/providers/place_provider.dart';
 import 'package:maps_place_picker/src/autocomplete_search.dart';
 import 'package:maps_place_picker/src/controllers/autocomplete_search_controller.dart';
 import 'package:maps_place_picker/src/google_map_place_picker.dart';
-import 'package:flutter_google_maps_webservices/places.dart';
+import 'package:maps_place_picker/src/models/component.dart';
+import 'package:maps_place_picker/src/models/prediction.dart';
+import 'package:maps_place_picker/src/services/places_service.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
-import 'dart:io' show Platform;
-
 import 'package:uuid/uuid.dart';
 
 typedef IntroModalWidgetBuilder = Widget Function(
@@ -427,7 +427,7 @@ class _PlacePickerState extends State<PlacePicker> {
       }
 
       provider!.selectedPlace =
-          PickResult.fromPlaceDetailResult(response.result);
+          PickResult.fromPlaceDetailResult(response.result!);
 
       // V2: validate geometry before attempting to animate the camera.
       if (provider!.selectedPlace?.geometry == null) {
@@ -448,14 +448,20 @@ class _PlacePickerState extends State<PlacePicker> {
   _moveTo(double latitude, double longitude) async {
     if (provider?.mapController == null) return;
     GoogleMapController? controller = provider!.mapController;
-    await controller!.animateCamera(
-      CameraUpdate.newCameraPosition(
-        CameraPosition(
-          target: LatLng(latitude, longitude),
-          zoom: 16,
+    try {
+      await controller!.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(latitude, longitude),
+            zoom: 16,
+          ),
         ),
-      ),
-    );
+      );
+    } catch (e) {
+      // B15: guard against PlatformException on devices where the map
+      // controller is not yet fully initialised when animateCamera is called.
+      debugPrint('B15: animateCamera error in _moveTo: $e');
+    }
   }
 
   _moveToCurrentPosition() async {
