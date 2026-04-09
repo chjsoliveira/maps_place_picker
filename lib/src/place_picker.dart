@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_api_headers/google_api_headers.dart';
@@ -160,7 +161,10 @@ class PlacePicker extends StatefulWidget {
   /// optional - set 'client' value in google_maps_webservice
   ///
   /// In case of using a proxy url that requires authentication
-  /// or custom configuration
+  /// or custom configuration.
+  ///
+  /// **Security:** the client must use HTTPS to ensure all API communication
+  /// is encrypted. Never pass a client configured for plain HTTP.
   final BaseClient? httpClient;
 
   /// Initial value of autocomplete search
@@ -364,7 +368,7 @@ class _PlacePickerState extends State<PlacePicker> {
                 icon: Icon(
                   Icons.arrow_back_ios,
                 ),
-                color: Colors.black.withAlpha(128),
+                color: Colors.black.withValues(alpha: 0.5),
                 padding: EdgeInsets.zero)
             : Container(),
         Expanded(
@@ -406,31 +410,39 @@ class _PlacePickerState extends State<PlacePicker> {
     if (prediction.placeId == null) return;
     provider!.placeSearchingState = SearchingState.Searching;
 
-    final PlacesDetailsResponse response =
-        await provider!.places.getDetailsByPlaceId(
-      prediction.placeId!,
-      sessionToken: provider!.sessionToken,
-      language: widget.autocompleteLanguage,
-    );
+    try {
+      final PlacesDetailsResponse response =
+          await provider!.places.getDetailsByPlaceId(
+        prediction.placeId!,
+        sessionToken: provider!.sessionToken,
+        language: widget.autocompleteLanguage,
+      );
 
-    if (response.errorMessage?.isNotEmpty == true ||
-        response.status == "REQUEST_DENIED") {
-      if (widget.onAutoCompleteFailed != null) {
-        widget.onAutoCompleteFailed!(response.status);
+      if (response.errorMessage?.isNotEmpty == true ||
+          response.status == "REQUEST_DENIED") {
+        if (widget.onAutoCompleteFailed != null) {
+          widget.onAutoCompleteFailed!(response.status);
+        }
+        return;
       }
-      return;
+
+      provider!.selectedPlace =
+          PickResult.fromPlaceDetailResult(response.result);
+
+      // V2: validate geometry before attempting to animate the camera.
+      if (provider!.selectedPlace?.geometry == null) {
+        debugPrint("Place detail result has no geometry — cannot move camera.");
+        return;
+      }
+
+      // Prevents searching again by camera movement.
+      provider!.isAutoCompleteSearching = true;
+
+      await _moveTo(provider!.selectedPlace!.geometry!.location.lat,
+          provider!.selectedPlace!.geometry!.location.lng);
+    } finally {
+      provider?.placeSearchingState = SearchingState.Idle;
     }
-
-    provider!.selectedPlace = PickResult.fromPlaceDetailResult(response.result);
-
-    // Prevents searching again by camera movement.
-    provider!.isAutoCompleteSearching = true;
-
-    await _moveTo(provider!.selectedPlace!.geometry!.location.lat,
-        provider!.selectedPlace!.geometry!.location.lng);
-
-    if (provider == null) return;
-    provider!.placeSearchingState = SearchingState.Idle;
   }
 
   _moveTo(double latitude, double longitude) async {
@@ -505,7 +517,10 @@ class _PlacePickerState extends State<PlacePicker> {
         if (provider == null) return;
         searchBarController.reset();
       },
-      onPlacePicked: widget.onPlacePicked,
+      onPlacePicked: (result) {
+        searchBarController.clearOverlay();
+        widget.onPlacePicked?.call(result);
+      },
       onCameraMoveStarted: widget.onCameraMoveStarted,
       onCameraMove: widget.onCameraMove,
       onCameraIdle: widget.onCameraIdle,
