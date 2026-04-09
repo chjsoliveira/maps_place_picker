@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_api_headers/google_api_headers.dart';
@@ -10,7 +9,6 @@ import 'package:maps_place_picker/providers/place_provider.dart';
 import 'package:maps_place_picker/src/autocomplete_search.dart';
 import 'package:maps_place_picker/src/controllers/autocomplete_search_controller.dart';
 import 'package:maps_place_picker/src/google_map_place_picker.dart';
-import 'package:maps_place_picker/src/models/component.dart';
 import 'package:maps_place_picker/src/models/prediction.dart';
 import 'package:maps_place_picker/src/services/places_service.dart';
 import 'package:http/http.dart';
@@ -27,8 +25,8 @@ enum PinState { preparing, idle, dragging }
 enum SearchingState { idle, searching }
 
 class PlacePicker extends StatefulWidget {
-  PlacePicker({
-    Key? key,
+  const PlacePicker({
+    super.key,
     required this.apiKey,
     this.onPlacePicked,
     required this.initialPosition,
@@ -78,7 +76,7 @@ class PlacePicker extends StatefulWidget {
     this.onMapTypeChanged,
     this.zoomGesturesEnabled = true,
     this.zoomControlsEnabled = false,
-  }) : super(key: key);
+  });
 
   final String apiKey;
 
@@ -237,7 +235,7 @@ class PlacePicker extends StatefulWidget {
   final bool zoomControlsEnabled;
 
   @override
-  _PlacePickerState createState() => _PlacePickerState();
+  State<PlacePicker> createState() => _PlacePickerState();
 }
 
 class _PlacePickerState extends State<PlacePicker> {
@@ -262,7 +260,7 @@ class _PlacePickerState extends State<PlacePicker> {
   }
 
   Future<PlaceProvider> _initPlaceProvider() async {
-    final headers = await GoogleApiHeaders().getHeaders();
+    final headers = await const GoogleApiHeaders().getHeaders();
     final provider = PlaceProvider(
       widget.apiKey,
       widget.proxyBaseUrl,
@@ -330,7 +328,7 @@ class _PlacePickerState extends State<PlacePicker> {
                 )
               ]);
             } else {
-              children.add(CircularProgressIndicator());
+              children.add(const CircularProgressIndicator());
             }
 
             return Scaffold(
@@ -349,7 +347,7 @@ class _PlacePickerState extends State<PlacePicker> {
   Widget _buildSearchBar(BuildContext context) {
     return Row(
       children: <Widget>[
-        SizedBox(width: 15),
+        const SizedBox(width: 15),
         provider!.placeSearchingState == SearchingState.idle &&
                 (widget.automaticallyImplyAppBarLeading ||
                     widget.onTapBack != null)
@@ -365,7 +363,7 @@ class _PlacePickerState extends State<PlacePicker> {
                     Navigator.maybePop(context);
                   }
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.arrow_back_ios,
                 ),
                 color: Colors.black.withValues(alpha: 0.5),
@@ -401,7 +399,7 @@ class _PlacePickerState extends State<PlacePicker> {
               autocompleteOnTrailingWhitespace:
                   widget.autocompleteOnTrailingWhitespace),
         ),
-        SizedBox(width: 5),
+        const SizedBox(width: 5),
       ],
     );
   }
@@ -540,7 +538,7 @@ class _PlacePickerState extends State<PlacePicker> {
         builder: (BuildContext context, StateSetter setState) {
       return showIntroModal && widget.introModalWidgetBuilder != null
           ? Stack(children: [
-              Positioned(
+              const Positioned(
                 top: 0,
                 right: 0,
                 bottom: 0,
