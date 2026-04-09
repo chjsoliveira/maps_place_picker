@@ -22,9 +22,9 @@ typedef IntroModalWidgetBuilder = Widget Function(
   Function? close,
 );
 
-enum PinState { Preparing, Idle, Dragging }
+enum PinState { preparing, idle, dragging }
 
-enum SearchingState { Idle, Searching }
+enum SearchingState { idle, searching }
 
 class PlacePicker extends StatefulWidget {
   PlacePicker({

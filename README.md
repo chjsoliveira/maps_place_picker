@@ -4,6 +4,10 @@ A Flutter plugin which provides 'Picking Place' using Google Maps widget.
 
 This is an actively maintained fork based on [google_maps_place_picker_mb](https://github.com/chjsoliveira/google_maps_place_picker_mb), which itself is a fork of [google_maps_place_picker](https://github.com/fysoul17/google_maps_place_picker).
 
+## Preview
+
+![Place Picker Preview](doc/preview.gif)
+
 ## Features
 
 - Pick a place by dragging the map pin (reverse geocoding)
@@ -195,7 +199,7 @@ Same steps as above — only the package name changes.
 
 ### Breaking changes vs upstream
 
-- Minimum Flutter SDK: **3.22.0** (Dart 3.4)
+- Minimum Flutter SDK: **3.38.0** (Dart 3.9.2)
 - `package_info_plus: ^9.0.0` requires consumers to target a recent SDK
 
 ## Publishing to pub.dev
