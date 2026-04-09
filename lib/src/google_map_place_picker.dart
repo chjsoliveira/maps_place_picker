@@ -648,6 +648,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
                 )
               : Container(),
           const SizedBox(height: 10),
+          enableMyLocationButton!
               ? SizedBox(
                   width: 35,
                   height: 35,
