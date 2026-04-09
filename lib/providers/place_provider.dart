@@ -183,7 +183,7 @@ class PlaceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  SearchingState _placeSearchingState = SearchingState.Idle;
+  SearchingState _placeSearchingState = SearchingState.idle;
 
   /// Whether a place search is currently in progress.
   SearchingState get placeSearchingState => _placeSearchingState;
@@ -205,7 +205,7 @@ class PlaceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  PinState _pinState = PinState.Preparing;
+  PinState _pinState = PinState.preparing;
 
   /// Current visual state of the map pin.
   PinState get pinState => _pinState;

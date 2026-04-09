@@ -350,7 +350,7 @@ class _PlacePickerState extends State<PlacePicker> {
     return Row(
       children: <Widget>[
         SizedBox(width: 15),
-        provider!.placeSearchingState == SearchingState.Idle &&
+        provider!.placeSearchingState == SearchingState.idle &&
                 (widget.automaticallyImplyAppBarLeading ||
                     widget.onTapBack != null)
             ? IconButton(
@@ -408,7 +408,7 @@ class _PlacePickerState extends State<PlacePicker> {
 
   _pickPrediction(Prediction prediction) async {
     if (prediction.placeId == null) return;
-    provider!.placeSearchingState = SearchingState.Searching;
+    provider!.placeSearchingState = SearchingState.searching;
 
     try {
       final PlacesDetailsResponse response =
@@ -441,7 +441,7 @@ class _PlacePickerState extends State<PlacePicker> {
       await _moveTo(provider!.selectedPlace!.geometry!.location.lat,
           provider!.selectedPlace!.geometry!.location.lng);
     } finally {
-      provider?.placeSearchingState = SearchingState.Idle;
+      provider?.placeSearchingState = SearchingState.idle;
     }
   }
 

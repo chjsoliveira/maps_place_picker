@@ -178,7 +178,7 @@ class _HomePageState extends State<HomePage> {
                                 zoomControlsEnabled: true,
                                 ignoreLocationPermissionErrors: true,
                                 onMapCreated: (GoogleMapController controller) {
-                                  print("Map created");
+                                  debugPrint("Map created");
                                 },
                                 onPlacePicked: (PickResult result) {
                                   print(
