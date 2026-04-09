@@ -366,7 +366,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
             child: Container(
               width: 5,
               height: 5,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.black,
                 shape: BoxShape.circle,
               ),
@@ -391,7 +391,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
             child: Container(
               width: 5,
               height: 5,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.black,
                 shape: BoxShape.circle,
               ),
@@ -414,7 +414,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
         if ((data.item1 == null && data.item2 == SearchingState.idle) ||
             data.item3 == true ||
             data.item4 == PinState.dragging &&
-                this.hidePlaceDetailsWhenDraggingPin!) {
+                hidePlaceDetailsWhenDraggingPin!) {
           return Container();
         } else {
           if (selectedPlaceWidgetBuilder == null) {
@@ -434,7 +434,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
       selector: (_, provider) => Tuple2<GoogleMapController?, LatLng?>(
           provider.mapController, provider.cameraPosition?.target),
       builder: (context, data, __) {
-        if (!this.zoomControlsEnabled ||
+        if (!zoomControlsEnabled ||
             data.item1 == null ||
             data.item2 == null) {
           return Container();
@@ -447,13 +447,13 @@ class GoogleMapPlacePicker extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12.0),
               ),
-              child: Container(
+              child: SizedBox(
                 width: MediaQuery.of(context).size.width * 0.15 - 13,
                 height: 107,
                 child: Column(
                   children: <Widget>[
                     IconButton(
-                        icon: Icon(Icons.add),
+                        icon: const Icon(Icons.add),
                         onPressed: () async {
                           try {
                             double currentZoomLevel =
@@ -471,9 +471,9 @@ class GoogleMapPlacePicker extends StatelessWidget {
                             debugPrint('B15: animateCamera error (zoom in): $e');
                           }
                         }),
-                    SizedBox(height: 2),
+                    const SizedBox(height: 2),
                     IconButton(
-                        icon: Icon(Icons.remove),
+                        icon: const Icon(Icons.remove),
                         onPressed: () async {
                           try {
                             double currentZoomLevel =
@@ -519,7 +519,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
   }
 
   Widget _buildLoadingIndicator() {
-    return Container(
+    return SizedBox(
       height: 48,
       child: const Center(
         child: SizedBox(
@@ -546,19 +546,19 @@ class GoogleMapPlacePicker extends StatelessWidget {
     WidgetStateColor buttonColor = WidgetStateColor.resolveWith(
         (states) => canBePicked ? Colors.lightGreen : Colors.red);
     return Container(
-      margin: EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10),
       child: Column(
         children: <Widget>[
           Text(
             result.formattedAddress ?? 'Address unavailable',
-            style: TextStyle(fontSize: 18),
+            style: const TextStyle(fontSize: 18),
             textAlign: TextAlign.center,
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           (canBePicked && (selectText?.isEmpty ?? true)) ||
                   (!canBePicked && (outsideOfPickAreaText?.isEmpty ?? true))
               ? SizedBox.fromSize(
-                  size: Size(56, 56), // button width and height
+                  size: const Size(56, 56), // button width and height
                   child: ClipOval(
                     child: Material(
                       child: InkWell(
@@ -597,7 +597,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
                                       ? Icons.check_sharp
                                       : Icons.app_blocking_sharp,
                                   color: buttonColor),
-                              SizedBox.fromSize(size: Size(10, 0)),
+                              SizedBox.fromSize(size: const Size(10, 0)),
                               Text(
                                   canBePicked
                                       ? selectText!
@@ -647,7 +647,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
                   ),
                 )
               : Container(),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           enableMyLocationButton!
               ? SizedBox(
                   width: 35,
