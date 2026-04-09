@@ -205,7 +205,7 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
     PlaceProvider provider = PlaceProvider.of(context, listen: false);
     provider.isSearchBarFocused = focus.hasFocus;
     provider.debounceTimer?.cancel();
-    provider.placeSearchingState = SearchingState.Idle;
+    provider.placeSearchingState = SearchingState.idle;
   }
 
   _searchPlace(String searchTerm) {

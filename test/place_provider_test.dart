@@ -50,7 +50,7 @@ void main() {
     });
 
     test('placeSearchingState defaults to Idle', () {
-      expect(provider.placeSearchingState, SearchingState.Idle);
+      expect(provider.placeSearchingState, SearchingState.idle);
     });
 
     test('mapController defaults to null', () {
@@ -58,7 +58,7 @@ void main() {
     });
 
     test('pinState defaults to Preparing', () {
-      expect(provider.pinState, PinState.Preparing);
+      expect(provider.pinState, PinState.preparing);
     });
 
     test('isSearchBarFocused defaults to false', () {
@@ -89,11 +89,11 @@ void main() {
       int notifyCount = 0;
       provider.addListener(() => notifyCount++);
 
-      provider.placeSearchingState = SearchingState.Searching;
+      provider.placeSearchingState = SearchingState.searching;
       expect(notifyCount, 1);
-      expect(provider.placeSearchingState, SearchingState.Searching);
+      expect(provider.placeSearchingState, SearchingState.searching);
 
-      provider.placeSearchingState = SearchingState.Idle;
+      provider.placeSearchingState = SearchingState.idle;
       expect(notifyCount, 2);
     });
 
@@ -101,9 +101,9 @@ void main() {
       int notifyCount = 0;
       provider.addListener(() => notifyCount++);
 
-      provider.pinState = PinState.Dragging;
+      provider.pinState = PinState.dragging;
       expect(notifyCount, 1);
-      expect(provider.pinState, PinState.Dragging);
+      expect(provider.pinState, PinState.dragging);
     });
 
     test('setting mapController notifies listeners', () {

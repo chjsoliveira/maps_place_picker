@@ -33,8 +33,8 @@ class PredictionTile extends StatelessWidget {
 
     if (prediction.matchedSubstrings.isNotEmpty) {
       final MatchedSubstring matchedSubString = prediction.matchedSubstrings[0];
-      final int offset = matchedSubString.offset as int;
-      final int length = matchedSubString.length as int;
+      final int offset = matchedSubString.offset;
+      final int length = matchedSubString.length;
       final int end = offset + length;
 
       // Guard against out-of-bounds offsets returned by the API.
