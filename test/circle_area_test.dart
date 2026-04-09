@@ -22,8 +22,8 @@ void main() {
       );
 
       // fillColor should be a semi-transparent blue (not fully opaque).
-      expect(area.fillColor.a, lessThan(1.0));
-      expect(area.fillColor.b, greaterThan(0.0)); // has blue channel
+      expect(area.fillColor.opacity, lessThan(1.0));
+      expect(area.fillColor.blue, greaterThan(0)); // has blue channel
     });
 
     test('uses blue stroke color with higher alpha than fill by default', () {
@@ -33,7 +33,7 @@ void main() {
       );
 
       // strokeColor should be more opaque than fillColor.
-      expect(area.strokeColor.a, greaterThan(area.fillColor.a));
+      expect(area.strokeColor.opacity, greaterThan(area.fillColor.opacity));
     });
 
     test('accepts custom fillColor', () {
