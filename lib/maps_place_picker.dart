@@ -1,4 +1,3 @@
-library maps_place_picker;
 
 export 'src/models/pick_result.dart';
 export 'src/models/component.dart';

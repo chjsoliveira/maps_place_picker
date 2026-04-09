@@ -6,14 +6,13 @@ import 'package:maps_place_picker/providers/place_provider.dart';
 import 'package:maps_place_picker/providers/search_provider.dart';
 import 'package:maps_place_picker/src/components/prediction_tile.dart';
 import 'package:maps_place_picker/src/controllers/autocomplete_search_controller.dart';
-import 'package:maps_place_picker/src/models/component.dart';
 import 'package:maps_place_picker/src/models/prediction.dart';
 import 'package:maps_place_picker/src/services/places_service.dart';
 import 'package:provider/provider.dart';
 
 class AutoCompleteSearch extends StatefulWidget {
   const AutoCompleteSearch(
-      {Key? key,
+      {super.key,
       required this.sessionToken,
       required this.onPicked,
       required this.appBarKey,
@@ -34,8 +33,7 @@ class AutoCompleteSearch extends StatefulWidget {
       this.region,
       this.initialSearchString,
       this.searchForInitialValue,
-      this.autocompleteOnTrailingWhitespace})
-      : super(key: key);
+      this.autocompleteOnTrailingWhitespace});
 
   final String? sessionToken;
   final String? hintText;
@@ -113,9 +111,9 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
               elevation: 0,
               child: Row(
                 children: <Widget>[
-                  SizedBox(width: 10),
-                  Icon(Icons.search),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
+                  const Icon(Icons.search),
+                  const SizedBox(width: 10),
                   Expanded(child: _buildSearchTextField()),
                   _buildTextClearIcon(),
                 ],
@@ -163,53 +161,53 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
               ),
             );
           } else {
-            return SizedBox(width: 10);
+            return const SizedBox(width: 10);
           }
         });
   }
 
   _onSearchInputChange() {
     if (!mounted) return;
-    this.provider.searchTerm = controller.text;
+    provider.searchTerm = controller.text;
 
-    PlaceProvider provider = PlaceProvider.of(context, listen: false);
+    PlaceProvider placeProvider = PlaceProvider.of(context, listen: false);
 
     if (controller.text.isEmpty) {
-      provider.debounceTimer?.cancel();
+      placeProvider.debounceTimer?.cancel();
       _searchPlace(controller.text);
       return;
     }
 
-    if (controller.text.trim() == this.provider.prevSearchTerm.trim()) {
-      provider.debounceTimer?.cancel();
+    if (controller.text.trim() == provider.prevSearchTerm.trim()) {
+      placeProvider.debounceTimer?.cancel();
       return;
     }
 
     if (!widget.autocompleteOnTrailingWhitespace! &&
         controller.text.substring(controller.text.length - 1) == " ") {
-      provider.debounceTimer?.cancel();
+      placeProvider.debounceTimer?.cancel();
       return;
     }
 
-    if (provider.debounceTimer?.isActive ?? false) {
-      provider.debounceTimer!.cancel();
+    if (placeProvider.debounceTimer?.isActive ?? false) {
+      placeProvider.debounceTimer!.cancel();
     }
 
-    provider.debounceTimer =
+    placeProvider.debounceTimer =
         Timer(Duration(milliseconds: widget.debounceMilliseconds!), () {
       _searchPlace(controller.text.trim());
     });
   }
 
   _onFocusChanged() {
-    PlaceProvider provider = PlaceProvider.of(context, listen: false);
-    provider.isSearchBarFocused = focus.hasFocus;
-    provider.debounceTimer?.cancel();
-    provider.placeSearchingState = SearchingState.idle;
+    PlaceProvider placeProvider = PlaceProvider.of(context, listen: false);
+    placeProvider.isSearchBarFocused = focus.hasFocus;
+    placeProvider.debounceTimer?.cancel();
+    placeProvider.placeSearchingState = SearchingState.idle;
   }
 
   _searchPlace(String searchTerm) {
-    this.provider.prevSearchTerm = searchTerm;
+    provider.prevSearchTerm = searchTerm;
 
     _clearOverlay();
 
@@ -267,16 +265,16 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
       child: Row(
         children: <Widget>[
-          SizedBox(
+          const SizedBox(
             height: 24,
             width: 24,
             child: CircularProgressIndicator(strokeWidth: 3),
           ),
-          SizedBox(width: 24),
+          const SizedBox(width: 24),
           Expanded(
             child: Text(
               widget.searchingText ?? "Searching...",
-              style: TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16),
             ),
           )
         ],
