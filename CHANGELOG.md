@@ -1,7 +1,7 @@
-## [3.2.0] - 09/Apr/2026
+## [1.0.0] - 09/Apr/2026
 
-- Renamed package to `maps_place_picker`
-- Ported all source code from `google_maps_place_picker_plus` (chjsoliveira fork)
+- Initial release as `maps_place_picker`
+- Ported all source code from `google_maps_place_picker_plus` (chjsoliveira fork, v3.2.0)
 
 ## [3.1.5] - 21/Mar/2026
 
