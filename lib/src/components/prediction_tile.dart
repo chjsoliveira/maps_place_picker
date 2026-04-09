@@ -5,12 +5,12 @@ class PredictionTile extends StatelessWidget {
   final Prediction prediction;
   final ValueChanged<Prediction>? onTap;
 
-  PredictionTile({required this.prediction, this.onTap});
+  const PredictionTile({super.key, required this.prediction, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Icon(Icons.location_on),
+      leading: const Icon(Icons.location_on),
       title: RichText(
         text: TextSpan(
           children: _buildPredictionText(context),

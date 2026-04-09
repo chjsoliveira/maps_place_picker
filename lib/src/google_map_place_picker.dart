@@ -29,7 +29,7 @@ typedef PinBuilder = Widget Function(
 
 class GoogleMapPlacePicker extends StatelessWidget {
   const GoogleMapPlacePicker({
-    Key? key,
+    super.key,
     required this.initialTarget,
     required this.appBarKey,
     this.selectedPlaceWidgetBuilder,
@@ -58,7 +58,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
     this.zoomGesturesEnabled = true,
     this.zoomControlsEnabled = false,
     this.fullMotion = false,
-  }) : super(key: key);
+  });
 
   final LatLng initialTarget;
   final GlobalKey appBarKey;
@@ -211,7 +211,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: <Widget>[
-        if (this.fullMotion)
+        if (fullMotion)
           SingleChildScrollView(
               physics: const NeverScrollableScrollPhysics(),
               child: SizedBox(
@@ -224,7 +224,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
                       _buildPin(),
                     ],
                   ))),
-        if (!this.fullMotion) ...[_buildGoogleMap(context), _buildPin()],
+        if (!fullMotion) ...[_buildGoogleMap(context), _buildPin()],
         _buildFloatingCard(),
         _buildMapIcons(context),
         _buildZoomButtons()
@@ -234,9 +234,9 @@ class GoogleMapPlacePicker extends StatelessWidget {
 
   Widget _buildGoogleMapInner(PlaceProvider provider, MapType mapType) {
     CameraPosition initialCameraPosition =
-        CameraPosition(target: this.initialTarget, zoom: 15);
+        CameraPosition(target: initialTarget, zoom: 15);
     return GoogleMap(
-      zoomGesturesEnabled: this.zoomGesturesEnabled,
+      zoomGesturesEnabled: zoomGesturesEnabled,
       zoomControlsEnabled:
           false, // we use our own implementation that supports iOS as well, see _buildZoomButtons()
       myLocationButtonEnabled: false,
@@ -246,8 +246,8 @@ class GoogleMapPlacePicker extends StatelessWidget {
       mapType: mapType,
       myLocationEnabled: true,
       circles: pickArea != null && pickArea!.radius > 0
-          ? Set<Circle>.from([pickArea])
-          : Set<Circle>(),
+          ? <Circle>{pickArea!}
+          : <Circle>{},
       onMapCreated: (GoogleMapController controller) {
         provider.mapController = controller;
         provider.setCameraPosition(null);
@@ -302,7 +302,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
         if (!provider.isAutoCompleteSearching) {
           provider.pinState = PinState.dragging;
           // Begins the search state if the hide details is enabled
-          if (this.hidePlaceDetailsWhenDraggingPin!) {
+          if (hidePlaceDetailsWhenDraggingPin!) {
             provider.placeSearchingState = SearchingState.searching;
           }
           onMoveStart?.call();
@@ -326,7 +326,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
   Widget _buildGoogleMap(BuildContext context) {
     return Selector<PlaceProvider, MapType>(
         selector: (_, provider) => provider.mapType,
-        builder: (_, data, __) => this._buildGoogleMapInner(
+        builder: (_, data, __) => _buildGoogleMapInner(
             PlaceProvider.of(context, listen: false), data));
   }
 
@@ -353,7 +353,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
     } else if (state == PinState.idle) {
       return Stack(
         children: <Widget>[
-          Center(
+          const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -377,7 +377,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
     } else {
       return Stack(
         children: <Widget>[
-          Center(
+          const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
@@ -519,9 +519,9 @@ class GoogleMapPlacePicker extends StatelessWidget {
   }
 
   Widget _buildLoadingIndicator() {
-    return SizedBox(
+    return const SizedBox(
       height: 48,
-      child: const Center(
+      child: Center(
         child: SizedBox(
           width: 24,
           height: 24,
