@@ -217,6 +217,11 @@ void main() {
 
       expect(find.byIcon(Icons.clear), findsOneWidget);
 
+      // The searching overlay may be shown on top of the clear icon after the
+      // debounce timer fires; clear it before tapping.
+      controller.clearOverlay();
+      await tester.pump();
+
       await tester.tap(find.byIcon(Icons.clear));
       await tester.pump();
 

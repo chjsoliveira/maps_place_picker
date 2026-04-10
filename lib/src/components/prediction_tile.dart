@@ -11,8 +11,8 @@ class PredictionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: const Icon(Icons.location_on),
-      title: RichText(
-        text: TextSpan(
+      title: Text.rich(
+        TextSpan(
           children: _buildPredictionText(context),
         ),
       ),

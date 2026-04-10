@@ -10,7 +10,11 @@ import 'package:maps_place_picker/src/models/geocoding_result.dart';
 // ───────────────────── helpers ────────────────────────────────────────────
 
 http.Client _mockClient(int statusCode, Map<String, dynamic> body) =>
-    MockClient((_) async => http.Response(jsonEncode(body), statusCode));
+    MockClient((_) async => http.Response(
+          jsonEncode(body),
+          statusCode,
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        ));
 
 // ─────────────────── PlacesService tests ──────────────────────────────────
 
