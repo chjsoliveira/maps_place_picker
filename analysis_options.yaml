@@ -6,3 +6,4 @@ linter:
     - missing_type_annotation
     - prefer_const_constructors
     - prefer_const_declarations
+    - public_member_api_docs
