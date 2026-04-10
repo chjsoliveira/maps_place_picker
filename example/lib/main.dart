@@ -65,6 +65,7 @@ class _HomePageState extends State<HomePage> {
   void initRenderer() {
     if (_mapsInitialized) return;
     if (widget.mapsImplementation is GoogleMapsFlutterAndroid) {
+      // "auto" is the default — no explicit initializeWithRenderer call needed.
       if (_mapsRenderer == "latest") {
         (widget.mapsImplementation as GoogleMapsFlutterAndroid)
             .initializeWithRenderer(AndroidMapRenderer.latest);
