@@ -134,7 +134,7 @@ class GoogleMapPlacePicker extends StatelessWidget {
   /// Optional set of [Polygon]s to overlay on the map.
   final Set<Polygon>? polygons;
 
-  _searchByCameraLocation(PlaceProvider provider) async {
+  Future<void> _searchByCameraLocation(PlaceProvider provider) async {
     // Guard: map must be ready before searching.
     if (provider.mapController == null) {
       provider.placeSearchingState = SearchingState.idle;

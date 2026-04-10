@@ -459,7 +459,7 @@ class _PlacePickerState extends State<PlacePicker> {
     );
   }
 
-  _pickPrediction(Prediction prediction) async {
+  Future<void> _pickPrediction(Prediction prediction) async {
     if (prediction.placeId == null) return;
     provider!.placeSearchingState = SearchingState.searching;
 
@@ -498,7 +498,7 @@ class _PlacePickerState extends State<PlacePicker> {
     }
   }
 
-  _moveTo(double latitude, double longitude) async {
+  Future<void> _moveTo(double latitude, double longitude) async {
     if (provider?.mapController == null) return;
     GoogleMapController? controller = provider!.mapController;
     try {
@@ -517,7 +517,7 @@ class _PlacePickerState extends State<PlacePicker> {
     }
   }
 
-  _moveToCurrentPosition() async {
+  Future<void> _moveToCurrentPosition() async {
     if (provider?.currentPosition == null) return;
     await _moveTo(provider!.currentPosition!.latitude,
         provider!.currentPosition!.longitude);
