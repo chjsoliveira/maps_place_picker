@@ -19,8 +19,8 @@ screenshots:
     path: doc/preview.gif
 
 environment:
-  sdk: ">=3.9.2 <4.0.0"
-  flutter: ">=3.38.0"
+  sdk: ">=3.6.0 <4.0.0"
+  flutter: ">=3.27.0"
 
 dependencies:
   flutter:

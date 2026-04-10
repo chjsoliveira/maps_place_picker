@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:maps_place_picker/maps_place_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-// ignore: implementation_imports, unused_import
-import 'package:maps_place_picker/src/google_map_place_picker.dart'; // do not import this yourself
 import 'dart:io' show Platform;
 
 // Your api key storage.

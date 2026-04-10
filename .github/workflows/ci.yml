@@ -21,7 +21,6 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.38.0'
           channel: stable
           cache: true
 
@@ -41,3 +40,6 @@ jobs:
       - name: Analyze example
         working-directory: example
         run: flutter analyze lib
+
+      - name: Publish dry-run
+        run: dart pub publish --dry-run
