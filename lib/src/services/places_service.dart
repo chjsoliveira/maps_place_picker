@@ -76,6 +76,8 @@ class PlacesService {
 
   /// Google Maps API key used to authenticate Places API requests.
   final String apiKey;
+
+  /// Optional base URL for proxying requests. Defaults to the Google Places API endpoint.
   final String? baseUrl;
 
   final http.Client _client;

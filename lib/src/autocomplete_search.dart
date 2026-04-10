@@ -127,9 +127,16 @@ class AutoCompleteSearch extends StatefulWidget {
 /// Exposed as a public class so that [SearchBarController] can call methods on
 /// it directly.
 class AutoCompleteSearchState extends State<AutoCompleteSearch> {
+  /// Controller for the search text field.
   TextEditingController controller = TextEditingController();
+
+  /// Focus node for the search text field.
   FocusNode focus = FocusNode();
+
+  /// The current overlay entry showing predictions or the searching indicator.
   OverlayEntry? overlayEntry;
+
+  /// Local search provider that tracks the current search term.
   SearchProvider provider = SearchProvider();
 
   @override
@@ -418,16 +425,19 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
     }
   }
 
+  /// Clears the search field text and resets the search term.
   void clearText() {
     provider.searchTerm = "";
     controller.clear();
   }
 
+  /// Clears the search field and removes focus from the search bar.
   void resetSearchBar() {
     clearText();
     focus.unfocus();
   }
 
+  /// Removes the autocomplete overlay from the screen.
   void clearOverlay() {
     _clearOverlay();
   }
