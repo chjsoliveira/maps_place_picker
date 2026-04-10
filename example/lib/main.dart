@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> {
                           });
                         }
                       },
-                      child: Row(
+                      child: const Row(
                         children: [
                           const Radio<String>(value: "auto"),
                           const Text("Auto"),
@@ -255,7 +255,7 @@ class _HomePageState extends State<HomePage> {
                         zoomControlsEnabled: false,
                         myLocationButtonEnabled: false,
                         mapToolbarEnabled: false,
-                        initialCameraPosition: CameraPosition(
+                        initialCameraPosition: const CameraPosition(
                             target: HomePage.kInitialPosition, zoom: 15),
                         mapType: MapType.normal,
                         myLocationEnabled: true,
