@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
 
-  static final kInitialPosition = LatLng(-33.8567844, 151.213108);
+  static const kInitialPosition = LatLng(-33.8567844, 151.213108);
 
   final GoogleMapsFlutterPlatform mapsImplementation =
       GoogleMapsFlutterPlatform.instance;
@@ -65,15 +65,9 @@ class _HomePageState extends State<HomePage> {
   void initRenderer() {
     if (_mapsInitialized) return;
     if (widget.mapsImplementation is GoogleMapsFlutterAndroid) {
-      switch (_mapsRenderer) {
-        case "legacy":
-          (widget.mapsImplementation as GoogleMapsFlutterAndroid)
-              .initializeWithRenderer(AndroidMapRenderer.legacy);
-          break;
-        case "latest":
-          (widget.mapsImplementation as GoogleMapsFlutterAndroid)
-              .initializeWithRenderer(AndroidMapRenderer.latest);
-          break;
+      if (_mapsRenderer == "latest") {
+        (widget.mapsImplementation as GoogleMapsFlutterAndroid)
+            .initializeWithRenderer(AndroidMapRenderer.latest);
       }
     }
     setState(() {
@@ -85,7 +79,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text("Maps Place Picker Demo"),
+          title: const Text("Maps Place Picker Demo"),
         ),
         body: Center(
           child: Column(
@@ -109,7 +103,7 @@ class _HomePageState extends State<HomePage> {
                                 .useAndroidViewSurface = value;
                           });
                         }),
-                    Text("Hybrid Composition"),
+                    const Text("Hybrid Composition"),
                   ]
                 ],
               ),
@@ -119,40 +113,31 @@ class _HomePageState extends State<HomePage> {
                   if (!_mapsInitialized &&
                       widget.mapsImplementation
                           is GoogleMapsFlutterAndroid) ...[
-                    Text("Renderer: "),
-                    Radio(
-                        groupValue: _mapsRenderer,
-                        value: "auto",
-                        onChanged: (value) {
+                    const Text("Renderer: "),
+                    RadioGroup<String>(
+                      groupValue: _mapsRenderer,
+                      onChanged: (value) {
+                        if (value != null) {
                           setState(() {
-                            _mapsRenderer = "auto";
+                            _mapsRenderer = value;
                           });
-                        }),
-                    Text("Auto"),
-                    Radio(
-                        groupValue: _mapsRenderer,
-                        value: "legacy",
-                        onChanged: (value) {
-                          setState(() {
-                            _mapsRenderer = "legacy";
-                          });
-                        }),
-                    Text("Legacy"),
-                    Radio(
-                        groupValue: _mapsRenderer,
-                        value: "latest",
-                        onChanged: (value) {
-                          setState(() {
-                            _mapsRenderer = "latest";
-                          });
-                        }),
-                    Text("Latest"),
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          const Radio<String>(value: "auto"),
+                          const Text("Auto"),
+                          const Radio<String>(value: "latest"),
+                          const Text("Latest"),
+                        ],
+                      ),
+                    ),
                   ]
                 ],
               ),
               !_showPlacePickerInContainer
                   ? ElevatedButton(
-                      child: Text("Load Place Picker"),
+                      child: const Text("Load Place Picker"),
                       onPressed: () {
                         initRenderer();
                         Navigator.push(
@@ -181,7 +166,7 @@ class _HomePageState extends State<HomePage> {
                                   debugPrint("Map created");
                                 },
                                 onPlacePicked: (PickResult result) {
-                                  print(
+                                  debugPrint(
                                       "Place picked: ${result.formattedAddress}");
                                   setState(() {
                                     selectedPlace = result;
@@ -189,7 +174,7 @@ class _HomePageState extends State<HomePage> {
                                   });
                                 },
                                 onMapTypeChanged: (MapType mapType) {
-                                  print(
+                                  debugPrint(
                                       "Map type changed to ${mapType.toString()}");
                                 },
                               );
@@ -201,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                   : Container(),
               !_showPlacePickerInContainer
                   ? ElevatedButton(
-                      child: Text("Load Place Picker in Container"),
+                      child: const Text("Load Place Picker in Container"),
                       onPressed: () {
                         initRenderer();
                         setState(() {
@@ -250,7 +235,7 @@ class _HomePageState extends State<HomePage> {
               _showPlacePickerInContainer
                   ? Container()
                   : ElevatedButton(
-                      child: Text("Toggle Google Map w/o Provider"),
+                      child: const Text("Toggle Google Map w/o Provider"),
                       onPressed: () {
                         initRenderer();
                         setState(() {
@@ -278,7 +263,7 @@ class _HomePageState extends State<HomePage> {
                         onCameraMoveStarted: () {},
                         onCameraMove: (CameraPosition position) {},
                       )),
-              !_showGoogleMapInContainer ? Container() : TextField(),
+              !_showGoogleMapInContainer ? Container() : const TextField(),
               // #endregion
             ],
           ),
