@@ -262,12 +262,12 @@ Same steps as above — only the package name and import path change.
 
 > These steps are for maintainers preparing a release.
 
-- [ ] Update `version` in `pubspec.yaml`
-- [ ] Update `CHANGELOG.md` with release notes
-- [ ] Ensure `flutter analyze` passes with no issues
-- [ ] Run `flutter test`
-- [ ] Run `dart pub publish --dry-run` to catch any issues
-- [ ] Tag the release: `git tag v<version> && git push --tags`
-- [ ] Run `dart pub publish`
+- Update `version` in `pubspec.yaml`
+- Update `CHANGELOG.md` with release notes
+- Ensure `flutter analyze` passes with no issues
+- Run `flutter test`
+- Run `dart pub publish --dry-run` to catch any issues
+- Tag the release: `git tag v<version> && git push --tags`
+- Run `dart pub publish`
 
 ---
