@@ -16,7 +16,7 @@ which itself is a fork of
 
 ## Preview
 
-![Place Picker Preview](doc/preview.gif)
+![Place Picker Preview]([doc/preview.gif](https://raw.githubusercontent.com/chjsoliveira/maps_place_picker/main/doc/preview.gif))
 
 ## Platform Support
 
