@@ -15,6 +15,7 @@ import 'package:maps_place_picker/src/services/places_service.dart';
 import 'package:provider/provider.dart';
 import 'package:tuple/tuple.dart';
 
+/// Signature for a builder that creates the widget shown when a place is selected.
 typedef SelectedPlaceWidgetBuilder = Widget Function(
   BuildContext context,
   PickResult? selectedPlace,
@@ -22,12 +23,16 @@ typedef SelectedPlaceWidgetBuilder = Widget Function(
   bool isSearchBarFocused,
 );
 
+/// Signature for a builder that creates the map pin widget.
 typedef PinBuilder = Widget Function(
   BuildContext context,
   PinState state,
 );
 
+/// The Google Maps widget used internally by [PlacePicker] to display the map,
+/// pin, and the selected-place action card.
 class GoogleMapPlacePicker extends StatelessWidget {
+  /// Creates a [GoogleMapPlacePicker].
   const GoogleMapPlacePicker({
     super.key,
     required this.initialTarget,
@@ -67,45 +72,87 @@ class GoogleMapPlacePicker extends StatelessWidget {
     this.polygons,
   });
 
+  /// The initial map camera target position.
   final LatLng initialTarget;
+
+  /// Key used to read the [AppBar]'s position for overlay placement.
   final GlobalKey appBarKey;
 
+  /// Builder for the widget shown when a place has been selected.
   final SelectedPlaceWidgetBuilder? selectedPlaceWidgetBuilder;
+
+  /// Builder for the draggable pin widget shown at the map centre.
   final PinBuilder? pinBuilder;
 
+  /// Called with the API status string when an autocomplete request fails.
   final ValueChanged<String>? onSearchFailed;
+
+  /// Called when the user starts moving the map.
   final VoidCallback? onMoveStart;
+
+  /// Callback invoked when the underlying [GoogleMap] is ready to use.
   final MapCreatedCallback? onMapCreated;
+
+  /// Called when the user toggles the map type (normal / satellite / …).
   final VoidCallback? onToggleMapType;
+
+  /// Called when the user taps the "My Location" button.
   final VoidCallback? onMyLocation;
+
+  /// Called when the user confirms a picked place.
   final ValueChanged<PickResult>? onPlacePicked;
 
+  /// Debounce delay in milliseconds between camera idle events and geocoding.
   final int? debounceMilliseconds;
+
+  /// Whether to show the map-type toggle button.
   final bool? enableMapTypeButton;
+
+  /// Whether to show the "My Location" button.
   final bool? enableMyLocationButton;
 
+  /// Whether to reverse-geocode the camera centre while the user pans.
   final bool? usePinPointingSearch;
+
+  /// Whether to fetch full place details after pin-pointing selection.
   final bool? usePlaceDetailSearch;
 
+  /// Whether to geocode [initialTarget] immediately on first render.
   final bool? selectInitialPosition;
 
+  /// BCP-47 language code used to localise geocoding results.
   final String? language;
+
+  /// Optional circular area used to restrict selectable locations.
   final CircleArea? pickArea;
 
+  /// Whether to re-geocode the pin position when the zoom level changes.
   final bool? forceSearchOnZoomChanged;
+
+  /// Whether to collapse the place-details card while the pin is being dragged.
   final bool? hidePlaceDetailsWhenDraggingPin;
 
   /// GoogleMap pass-through events:
+  ///
+  /// Called when the camera starts moving (receives the current [PlaceProvider]).
   final Function(PlaceProvider)? onCameraMoveStarted;
+
+  /// Called repeatedly while the camera is moving.
   final CameraPositionCallback? onCameraMove;
+
+  /// Called when the camera becomes idle (receives the current [PlaceProvider]).
   final Function(PlaceProvider)? onCameraIdle;
 
-  // strings
+  /// Label for the "Select here" confirmation button.
   final String? selectText;
+
+  /// Label shown on the button when the pin is outside the pick area.
   final String? outsideOfPickAreaText;
 
-  /// Zoom feature toggle
+  /// Whether pinch-to-zoom and double-tap zoom gestures are enabled.
   final bool zoomGesturesEnabled;
+
+  /// Whether the on-screen zoom +/- controls are shown.
   final bool zoomControlsEnabled;
 
   /// Use never scrollable scroll-view with maximum dimensions to prevent unnecessary re-rendering.

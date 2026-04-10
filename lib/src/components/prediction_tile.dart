@@ -10,6 +10,7 @@ class PredictionTile extends StatelessWidget {
   /// Called when the user taps the tile.
   final ValueChanged<Prediction>? onTap;
 
+  /// Creates a [PredictionTile] for the given [prediction].
   const PredictionTile({super.key, required this.prediction, this.onTap});
 
   @override

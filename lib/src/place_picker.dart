@@ -280,10 +280,11 @@ class PlacePicker extends StatefulWidget {
   /// If this is set to `true` the UI will be blocked.
   final bool ignoreLocationPermissionErrors;
 
-  // Raised when clicking on the back arrow.
-  // This will not listen for the system back button on Android devices.
-  // If this is not set, but the back button is visible through automaticallyImplyLeading,
-  // the Navigator will try to pop instead.
+  /// Called when the user taps the back arrow.
+  ///
+  /// This will not listen for the system back button on Android devices.
+  /// If this is not set, but the back button is visible through
+  /// [automaticallyImplyLeading], the [Navigator] will try to pop instead.
   final VoidCallback? onTapBack;
 
   /// GoogleMap pass-through events:
