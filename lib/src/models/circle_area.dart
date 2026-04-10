@@ -2,7 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:uuid/uuid.dart';
 
+/// A circular area on the map used to restrict the pickable region.
+///
+/// Extends [Circle] from `google_maps_flutter` and auto-generates a unique
+/// [CircleId] so that multiple instances can be used simultaneously.
 class CircleArea extends Circle {
+  /// Creates a [CircleArea] centred at [center] with the given [radius] in
+  /// metres.
+  ///
+  /// Defaults to a semi-transparent blue fill and a mostly-opaque blue stroke.
   CircleArea({
     required super.center,
     required super.radius,

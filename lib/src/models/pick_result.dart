@@ -14,6 +14,10 @@ export 'package:maps_place_picker/src/models/place_details.dart';
 /// [addressComponents] are populated. All other fields require
 /// `usePlaceDetailSearch: true`.
 class PickResult {
+  /// Creates a [PickResult] with the given fields.
+  ///
+  /// All parameters are optional. Fields beyond [addressComponents] are only
+  /// populated when [PlacePicker.usePlaceDetailSearch] is `true`.
   PickResult({
     this.placeId,
     this.geometry,
@@ -34,25 +38,81 @@ class PickResult {
     this.reviews,
   });
 
+  /// The unique Place ID returned by the Places API.
   final String? placeId;
+
+  /// Geographic location and viewport for the place.
   final Geometry? geometry;
+
+  /// Human-readable address of the place.
   final String? formattedAddress;
+
+  /// List of place-type strings (e.g. `["locality", "political"]`).
   final List<String>? types;
+
+  /// Structured address components (street, city, country, etc.).
   final List<AddressComponent>? addressComponents;
 
   // The fields below are only populated when usePlaceDetailSearch = true.
 
+  /// Address in [adr microformat](http://microformats.org/wiki/adr).
+  ///
+  /// Only populated when [PlacePicker.usePlaceDetailSearch] is `true`.
   final String? adrAddress;
+
+  /// Local phone number in national format.
+  ///
+  /// Only populated when [PlacePicker.usePlaceDetailSearch] is `true`.
   final String? formattedPhoneNumber;
+
+  /// Human-readable name of the place.
+  ///
+  /// Only populated when [PlacePicker.usePlaceDetailSearch] is `true`.
   final String? name;
+
+  /// Opening hours for the place.
+  ///
+  /// Only populated when [PlacePicker.usePlaceDetailSearch] is `true`.
   final OpeningHoursDetail? openingHours;
+
+  /// Photos associated with the place.
+  ///
+  /// Only populated when [PlacePicker.usePlaceDetailSearch] is `true`.
   final List<Photo>? photos;
+
+  /// Phone number in international format.
+  ///
+  /// Only populated when [PlacePicker.usePlaceDetailSearch] is `true`.
   final String? internationalPhoneNumber;
+
+  /// Price level of the place.
+  ///
+  /// Only populated when [PlacePicker.usePlaceDetailSearch] is `true`.
   final PriceLevel? priceLevel;
+
+  /// Average user rating (0.0–5.0).
+  ///
+  /// Only populated when [PlacePicker.usePlaceDetailSearch] is `true`.
   final num? rating;
+
+  /// Google Maps URL for the place.
+  ///
+  /// Only populated when [PlacePicker.usePlaceDetailSearch] is `true`.
   final String? url;
+
+  /// Simplified address used as a vicinity substitute.
+  ///
+  /// Only populated when [PlacePicker.usePlaceDetailSearch] is `true`.
   final String? vicinity;
+
+  /// Official website of the place.
+  ///
+  /// Only populated when [PlacePicker.usePlaceDetailSearch] is `true`.
   final String? website;
+
+  /// User-contributed reviews for the place.
+  ///
+  /// Only populated when [PlacePicker.usePlaceDetailSearch] is `true`.
   final List<Review>? reviews;
 
   // ──────────────────────── Convenience getters ──────────────────────────

@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:maps_place_picker/src/models/prediction.dart';
 
+/// A [ListTile] that displays an autocomplete [Prediction] and highlights the
+/// portion of the description that matched the user's query.
 class PredictionTile extends StatelessWidget {
+  /// The autocomplete prediction to display.
   final Prediction prediction;
+
+  /// Called when the user taps the tile.
   final ValueChanged<Prediction>? onTap;
 
   const PredictionTile({super.key, required this.prediction, this.onTap});

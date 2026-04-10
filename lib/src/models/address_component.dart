@@ -1,6 +1,7 @@
 /// A component of a formatted address, as returned by the Places /
 /// Geocoding APIs.
 class AddressComponent {
+  /// Creates an [AddressComponent] with [longName], [shortName], and [types].
   const AddressComponent({
     required this.longName,
     required this.shortName,
