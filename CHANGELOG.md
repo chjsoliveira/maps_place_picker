@@ -1,44 +1,63 @@
-## [1.1.0] - 09/Apr/2026 — Sprint 3 & 4
+## [1.0.0] - 10/Apr/2026
 
-### ⚠️ Breaking changes
-- **Removed** `flutter_google_maps_webservices` dependency. Consumers who imported
-  types such as `Geometry`, `AddressComponent`, `Prediction`, or `Component` directly
-  from that package should now import them from `maps_place_picker` instead.
+First publication to pub.dev.
+Ported and fully reworked from `google_maps_place_picker_mb` (chjsoliveira fork, v3.2.0),
+which itself derives from [fysoul17/google_maps_place_picker](https://github.com/fysoul17/google_maps_place_picker).
+
+### ⚠️ Breaking changes vs the upstream package
+
+- **Removed** `flutter_google_maps_webservices` dependency. Types such as
+  `Geometry`, `AddressComponent`, `Prediction`, and `Component` are now exported
+  directly from `maps_place_picker`.
 - `PickResult` fields `id`, `reference`, `icon`, `scope`, and `utcOffset` have been
-  removed. These mapped to deprecated Places API v1 fields that have no equivalent in
-  the Places API (New). Rename `name` → `name` (unchanged), `website` → `website`
-  (unchanged), `url` → `url` (now `googleMapsUri`).
+  removed — they mapped to deprecated Places API v1 fields with no equivalent in the
+  Places API (New). `url` is now `googleMapsUri`.
+- Minimum Flutter SDK: **3.38.0** (Dart 3.9.2).
 
-### New features / improvements
-- **D5/M1** Replaced unmaintained `flutter_google_maps_webservices` with direct HTTP
-  calls to the **Places API (New)** (`https://places.googleapis.com/v1/`) and the
-  **Geocoding API**. No external wrapper package is required.
-- **B11** `strictbounds: true` now correctly uses `locationRestriction` (hard boundary)
-  in the Places API (New) request instead of being silently ignored.
-- **B12** `region` is now sent as `regionCode` to the New API, providing proper
-  result biasing by CLDR region code.
-- **B10** Fixed autocomplete overlay offset calculation in non-standard layouts by
-  using `localToGlobal` instead of `paintBounds + getTransformTo`.
-- **B14** Autocomplete results overlay no longer overlaps the on-screen keyboard;
-  it is constrained above it via `MediaQuery.viewInsets.bottom`.
-- **B15** `animateCamera` calls are now wrapped in try-catch to prevent crashes on
-  devices where the map controller is not yet fully initialised (upstream #96).
-- **B16** The `PickResult.geometry.location` now reflects the exact pin position
-  (camera target) rather than the geocoding centroid, fixing inaccurate coordinates
-  in rural / low-density areas (upstream #132).
-- **B13** `onMapCreated` callback forwarding verified; no change needed — it was
-  already correctly forwarded through the widget hierarchy.
-- **M3** Added unit tests for models (`Geometry`, `Location`, `AddressComponent`,
-  `Prediction`, `MatchedSubstring`, `GeocodingResult`, `PriceLevel`),
-  `PickResult` factory methods, `SearchProvider`, and service layer.
-- **M4** Unit tests cover `PlacesService` and `GeocodingService` HTTP behaviour
-  including error cases, `strictbounds` routing, and `regionCode` mapping.
-- **M6** Updated `http` to `^1.2.0`, `provider` to `^6.1.2`, `uuid` to `^4.5.1`.
+### Features
 
-## [1.0.0] - 09/Apr/2026
+- Pick a place by dragging the map pin (reverse geocoding via Geocoding API).
+- Pick a place by typing in the autocomplete search bar (Places API — New).
+- Customisable pin, floating card, and intro modal via builder callbacks.
+- Restrict valid picks to a circular area (`pickArea`).
+- Zoom controls (cross-platform, including iOS).
+- Dark mode support.
+- 40+ named parameters — see README for the full API reference.
 
-- Initial release as `maps_place_picker`
-- Ported all source code from `google_maps_place_picker_plus` (chjsoliveira fork, v3.2.0)
+### Bug fixes & improvements (vs upstream)
+
+- **Places API (New)** — replaced unmaintained `flutter_google_maps_webservices`
+  with direct HTTP calls to `https://places.googleapis.com/v1/`.
+- **B1** `selectInitialPosition: true` now waits for the first `onCameraIdle`
+  before reverse-geocoding, preventing a race condition at startup.
+- **B2** Added `finally` block to `_pickPrediction` so the loading indicator
+  always resets, even when the Places Detail call fails silently.
+- **B3** Bounds-checked `matchedSubString` offsets to prevent `RangeError` when
+  selecting from autocomplete.
+- **B4** Autocomplete overlay is dismissed when the user taps "Select here".
+- **B5** Early-return guard when `mapController` is `null` during initial drag.
+- **B6** `OverlayEntry.remove()` wrapped in try-catch to prevent errors after
+  the parent route is popped.
+- **B7** `debounceTimer` cancelled in `PlaceProvider.dispose()`.
+- **B8** Fixed iOS map rollback after autocomplete pick by correcting
+  `isAutoCompleteSearching` reset timing.
+- **B9** `selectedPlace` fields are now populated correctly when
+  `usePlaceDetailSearch = false`.
+- **B10** Autocomplete overlay offset uses `localToGlobal` for correct placement
+  in non-standard layouts.
+- **B11** `strictbounds: true` now uses `locationRestriction` (hard boundary)
+  instead of being silently ignored.
+- **B12** `region` is forwarded as `regionCode` to the New API for proper biasing.
+- **B14** Autocomplete results no longer overlap the on-screen keyboard.
+- **B15** `animateCamera` calls wrapped in try-catch to prevent crashes on devices
+  where the map controller is not yet fully initialised.
+- **B16** `PickResult.geometry.location` reflects the exact pin position rather
+  than the geocoding centroid, fixing inaccurate coordinates in rural areas.
+- **D1–D6** Replaced all deprecated Flutter APIs (`withAlpha`, `RawMaterialButton`,
+  forced `!` on nullable `Color`, `new` keyword, `EagerGestureRecognizer` reviewed).
+- **M2** GitHub Actions CI: `flutter analyze` + `flutter test`.
+- **M3/M4** Unit and widget tests for models, services, providers, and search.
+- **V1–V3** API key best-practice documentation; stricter API-response validation.
 
 ## [3.1.5] - 21/Mar/2026
 

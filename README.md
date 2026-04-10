@@ -1,8 +1,18 @@
 # maps_place_picker
 
-A Flutter plugin which provides 'Picking Place' using Google Maps widget.
+A Flutter package that provides a **Pick a Place** UI powered by Google Maps —
+drag the pin, search via autocomplete, restrict to an area, dark mode.
 
-This is an actively maintained fork based on [google_maps_place_picker_mb](https://github.com/chjsoliveira/google_maps_place_picker_mb), which itself is a fork of [google_maps_place_picker](https://github.com/fysoul17/google_maps_place_picker).
+> **Platform support: Android & iOS.**
+> This package wraps `google_maps_flutter` and the Google Places API (New), which
+> require native SDKs and therefore run on **Android and iOS only**.
+> Web/desktop support is not planned unless `google_maps_flutter` gains full
+> feature parity on those platforms.
+
+This is an actively maintained fork based on
+[google_maps_place_picker_mb](https://github.com/chjsoliveira/google_maps_place_picker_mb),
+which itself is a fork of
+[google_maps_place_picker](https://github.com/fysoul17/google_maps_place_picker).
 
 ## Preview
 
@@ -20,6 +30,13 @@ This is an actively maintained fork based on [google_maps_place_picker_mb](https
 ## Getting started
 
 Add to `pubspec.yaml`:
+
+```yaml
+dependencies:
+  maps_place_picker: ^1.0.0
+```
+
+Or, to track the latest commit directly from GitHub:
 
 ```yaml
 dependencies:
@@ -134,7 +151,7 @@ See the `example/` directory for a complete demo application.
 | `autocompleteRadius` | `num?` | — | Search radius in metres |
 | `autocompleteOffset` | `num?` | — | Character offset for autocomplete |
 | `strictbounds` | `bool?` | — | Restrict results to the autocomplete radius |
-| `region` | `String?` | — | Region bias (ccTLD format) |
+| `region` | `String?` | — | Region bias (CLDR region code) |
 | `pickArea` | `CircleArea?` | — | Restrict valid picks to a circle |
 | `enableMapTypeButton` | `bool` | `true` | Show the map-type toggle button |
 | `enableMyLocationButton` | `bool` | `true` | Show the "my location" button |
@@ -175,9 +192,7 @@ See the `example/` directory for a complete demo application.
 # google_maps_place_picker: ...
 
 # Add:
-maps_place_picker:
-  git:
-    url: https://github.com/chjsoliveira/maps_place_picker
+maps_place_picker: ^1.0.0
 ```
 
 2. Update all imports:
@@ -192,15 +207,20 @@ import 'package:maps_place_picker/maps_place_picker.dart';
 
 3. `RaisedButton` has been replaced — no code changes needed.
 4. `geolocator` is now used instead of `permission_handler` — no code changes needed.
+5. `flutter_google_maps_webservices` is no longer a dependency. Types such as
+   `Geometry`, `AddressComponent`, `Prediction`, and `Component` are exported
+   directly from `maps_place_picker`.
+6. `PickResult` fields `id`, `reference`, `icon`, `scope`, and `utcOffset` have been
+   removed. `url` is now `googleMapsUri`.
 
 ### From `google_maps_place_picker_mb` (chjsoliveira)
 
-Same steps as above — only the package name changes.
+Same steps as above — only the package name and import path change.
 
 ### Breaking changes vs upstream
 
 - Minimum Flutter SDK: **3.38.0** (Dart 3.9.2)
-- `package_info_plus: ^9.0.0` requires consumers to target a recent SDK
+- `flutter_google_maps_webservices` is no longer a transitive dependency
 
 ## Publishing to pub.dev
 
@@ -209,7 +229,7 @@ Same steps as above — only the package name changes.
 - [ ] Update `version` in `pubspec.yaml`
 - [ ] Update `CHANGELOG.md` with release notes
 - [ ] Ensure `flutter analyze` passes with no issues
-- [ ] Run `flutter test` (add tests before first publish)
+- [ ] Run `flutter test`
 - [ ] Run `dart pub publish --dry-run` to catch any issues
 - [ ] Tag the release: `git tag v<version> && git push --tags`
 - [ ] Run `dart pub publish`
