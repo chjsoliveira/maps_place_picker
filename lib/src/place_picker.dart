@@ -15,16 +15,49 @@ import 'package:http/http.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
+/// Signature for a builder that creates an intro modal overlay.
+///
+/// [context] is the current [BuildContext]. [close] is a callback that hides
+/// the modal when invoked.
 typedef IntroModalWidgetBuilder = Widget Function(
   BuildContext context,
   Function? close,
 );
 
-enum PinState { preparing, idle, dragging }
+/// Visual state of the draggable map pin.
+enum PinState {
+  /// The pin is being prepared before the map is fully ready.
+  preparing,
 
-enum SearchingState { idle, searching }
+  /// The pin is stationary and no camera movement is in progress.
+  idle,
 
+  /// The user is actively dragging the pin / moving the camera.
+  dragging,
+}
+
+/// Whether a place search is currently in flight.
+enum SearchingState {
+  /// No search is in progress.
+  idle,
+
+  /// A search request has been sent and a response is awaited.
+  searching,
+}
+
+/// A full-screen widget that lets users search for and select a location.
+///
+/// Renders a [GoogleMap] with an autocomplete search bar, a draggable pin, and
+/// a floating card that shows the selected place. The selected result is
+/// returned via [onPlacePicked].
+///
+/// Uses the **Places API (New)** for autocomplete and place details and the
+/// **Geocoding API** for reverse-geocoding the camera position.
 class PlacePicker extends StatefulWidget {
+  /// Creates a [PlacePicker].
+  ///
+  /// [apiKey] and [initialPosition] are required. All other parameters are
+  /// optional and have sensible defaults.
   const PlacePicker({
     super.key,
     required this.apiKey,
@@ -88,36 +121,80 @@ class PlacePicker extends StatefulWidget {
     this.polygons,
   });
 
+  /// Google Maps API key used for Places and Geocoding requests.
   final String apiKey;
 
+  /// The initial camera position shown when the picker opens.
   final LatLng initialPosition;
+
+  /// Whether to move the camera to the device's current location on open.
   final bool? useCurrentLocation;
+
+  /// Desired GPS accuracy when fetching the current location.
   final LocationAccuracy desiredLocationAccuracy;
 
+  /// Hint text shown in the empty search field.
   final String? hintText;
+
+  /// Text shown in the search bar while an autocomplete request is in flight.
   final String? searchingText;
+
+  /// Label for the "Select here" confirmation button.
   final String? selectText;
+
+  /// Text shown when the selected pin is outside the [pickArea].
   final String? outsideOfPickAreaText;
 
+  /// Called with the status string when an autocomplete request fails.
   final ValueChanged<String>? onAutoCompleteFailed;
+
+  /// Called with the status string when a geocoding request fails.
   final ValueChanged<String>? onGeocodingSearchFailed;
+
+  /// Debounce delay in milliseconds for autocomplete requests. Defaults to 500.
   final int autoCompleteDebounceInMilliseconds;
+
+  /// Debounce delay in milliseconds for camera-move searches. Defaults to 750.
   final int cameraMoveDebounceInMilliseconds;
 
+  /// The [MapType] shown when the picker first opens.
   final MapType initialMapType;
+
+  /// Whether to show the map-type toggle button.
   final bool enableMapTypeButton;
+
+  /// Whether to show the "my location" button.
   final bool enableMyLocationButton;
+
+  /// Cooldown in seconds for the "my location" button after it is tapped.
   final int myLocationButtonCooldown;
 
+  /// Whether to trigger a reverse-geocode search when the camera stops moving.
   final bool usePinPointingSearch;
+
+  /// Whether to fetch full place details via the Places API after a pin pick.
   final bool usePlaceDetailSearch;
 
+  /// Character offset passed to the autocomplete API.
   final num? autocompleteOffset;
+
+  /// Search radius in metres passed to the autocomplete API.
   final num? autocompleteRadius;
+
+  /// BCP-47 language code for localising autocomplete results.
   final String? autocompleteLanguage;
+
+  /// Place-type filters for the autocomplete request.
   final List<String>? autocompleteTypes;
+
+  /// Country (or other component) filters for the autocomplete request.
   final List<Component>? autocompleteComponents;
+
+  /// When `true`, restricts autocomplete results to the [autocompleteRadius]
+  /// circle instead of merely biasing them.
   final bool? strictbounds;
+
+  /// CLDR two-character region code used to bias autocomplete results.
   final String? region;
 
   /// If set the picker can only pick addresses in the given circle area.
@@ -135,6 +212,8 @@ class PlacePicker extends StatefulWidget {
   /// Defaults to true.
   final bool resizeToAvoidBottomInset;
 
+  /// Whether to trigger a search on the initial camera position immediately
+  /// after the map is created.
   final bool selectInitialPosition;
 
   /// By using default setting of Place Picker, it will result result when user hits the select here button.
@@ -459,7 +538,7 @@ class _PlacePickerState extends State<PlacePicker> {
     );
   }
 
-  _pickPrediction(Prediction prediction) async {
+  Future<void> _pickPrediction(Prediction prediction) async {
     if (prediction.placeId == null) return;
     provider!.placeSearchingState = SearchingState.searching;
 
@@ -498,7 +577,7 @@ class _PlacePickerState extends State<PlacePicker> {
     }
   }
 
-  _moveTo(double latitude, double longitude) async {
+  Future<void> _moveTo(double latitude, double longitude) async {
     if (provider?.mapController == null) return;
     GoogleMapController? controller = provider!.mapController;
     try {
@@ -517,7 +596,7 @@ class _PlacePickerState extends State<PlacePicker> {
     }
   }
 
-  _moveToCurrentPosition() async {
+  Future<void> _moveToCurrentPosition() async {
     if (provider?.currentPosition == null) return;
     await _moveTo(provider!.currentPosition!.latitude,
         provider!.currentPosition!.longitude);

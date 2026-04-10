@@ -12,6 +12,7 @@ class Component {
   /// alpha-2 code (e.g. `"us"`, `"br"`, `"de"`).
   static const String country = 'country';
 
+  /// Creates a [Component] with a [component] type and a [value].
   const Component(this.component, this.value);
 
   /// The component type (currently only [country] is supported).

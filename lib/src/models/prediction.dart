@@ -1,6 +1,7 @@
 /// A substring in a [Prediction.description] that is highlighted because it
 /// matched the user's query.
 class MatchedSubstring {
+  /// Creates a [MatchedSubstring] with [offset] and [length].
   const MatchedSubstring({required this.offset, required this.length});
 
   /// Zero-based character offset of the match start.
@@ -9,6 +10,8 @@ class MatchedSubstring {
   /// Number of characters in the match.
   final int length;
 
+  /// Parses a [MatchedSubstring] from the classic Places API JSON format
+  /// (`offset` / `length` keys).
   factory MatchedSubstring.fromJson(Map<String, dynamic> json) =>
       MatchedSubstring(
         offset: json['offset'] as int? ?? 0,
@@ -27,14 +30,20 @@ class MatchedSubstring {
 /// Structured representation of an autocomplete prediction broken into a
 /// main text and a secondary text.
 class StructuredFormatting {
+  /// Creates a [StructuredFormatting] with [mainText] and optional
+  /// [secondaryText].
   const StructuredFormatting({
     required this.mainText,
     this.secondaryText,
   });
 
+  /// Primary text of the prediction (usually the place name).
   final String mainText;
+
+  /// Secondary text of the prediction (usually the address or region).
   final String? secondaryText;
 
+  /// Parses a [StructuredFormatting] from the Places API (New) JSON format.
   factory StructuredFormatting.fromNewApiJson(Map<String, dynamic> json) =>
       StructuredFormatting(
         mainText:
@@ -47,6 +56,7 @@ class StructuredFormatting {
 
 /// An autocomplete suggestion returned by the Places Autocomplete API.
 class Prediction {
+  /// Creates a [Prediction] with the given fields.
   const Prediction({
     this.placeId,
     this.description,
@@ -55,6 +65,7 @@ class Prediction {
     this.types = const [],
   });
 
+  /// The unique Place ID for this prediction.
   final String? placeId;
 
   /// Human-readable name of the place, suitable for display.
@@ -63,6 +74,7 @@ class Prediction {
   /// Substrings within [description] that match the user's query.
   final List<MatchedSubstring> matchedSubstrings;
 
+  /// Structured breakdown of the prediction text.
   final StructuredFormatting? structuredFormatting;
 
   /// Place types for this prediction (e.g. `["locality", "geocode"]`).

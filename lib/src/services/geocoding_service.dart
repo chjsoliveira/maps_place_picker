@@ -9,6 +9,10 @@ const _geocodingBaseUrl = 'https://maps.googleapis.com';
 ///
 /// Used for reverse-geocoding the map camera position.
 class GeocodingService {
+  /// Creates a [GeocodingService].
+  ///
+  /// [apiKey] is required. [baseUrl] sets an optional proxy host. [httpClient]
+  /// allows injecting a custom HTTP client (useful for testing).
   GeocodingService({
     required this.apiKey,
     this.baseUrl,
@@ -17,6 +21,7 @@ class GeocodingService {
   })  : _client = httpClient ?? http.Client(),
         _apiHeaders = apiHeaders ?? const {};
 
+  /// Google Maps API key used to authenticate Geocoding API requests.
   final String apiKey;
 
   /// Optional proxy base URL. When set, every request will use this URL as the

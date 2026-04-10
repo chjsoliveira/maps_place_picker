@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/chjsoliveira/maps_place_picker/discussions
+    about: Para dúvidas gerais de uso, use as Discussions. / For general usage questions, use Discussions.
+  - name: 📖 README & Documentation
+    url: https://github.com/chjsoliveira/maps_place_picker#readme
+    about: Consulte o README antes de abrir uma issue. / Check the README before opening an issue.

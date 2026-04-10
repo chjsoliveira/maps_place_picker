@@ -11,6 +11,7 @@ const _defaultPlacesBaseUrl = 'https://places.googleapis.com';
 
 /// Response from the Places API (New) autocomplete endpoint.
 class PlacesAutocompleteResponse {
+  /// Creates a [PlacesAutocompleteResponse] with [status] and [predictions].
   const PlacesAutocompleteResponse({
     required this.status,
     required this.predictions,
@@ -20,24 +21,36 @@ class PlacesAutocompleteResponse {
   /// HTTP-derived status: `"OK"` on success, `"REQUEST_DENIED"` on auth
   /// failure, or an HTTP status code string on network error.
   final String status;
+
+  /// List of autocomplete suggestions; empty when the request failed.
   final List<Prediction> predictions;
+
+  /// Optional human-readable error message.
   final String? errorMessage;
 
+  /// Whether the response indicates a successful request.
   bool get isOk => status == 'OK';
 }
 
 /// Response from the Places API (New) place-details endpoint.
 class PlacesDetailsResponse {
+  /// Creates a [PlacesDetailsResponse] with [status] and optional [result].
   const PlacesDetailsResponse({
     required this.status,
     this.result,
     this.errorMessage,
   });
 
+  /// API status string (e.g. `"OK"`, `"REQUEST_DENIED"`).
   final String status;
+
+  /// The [PlaceDetails] result, or `null` if the request failed.
   final PlaceDetails? result;
+
+  /// Optional human-readable error message.
   final String? errorMessage;
 
+  /// Whether the response indicates a successful request.
   bool get isOk => status == 'OK';
 }
 
@@ -49,6 +62,10 @@ class PlacesDetailsResponse {
 /// - [autocomplete] – Places Autocomplete (New)
 /// - [getDetailsByPlaceId] – Place Details (New)
 class PlacesService {
+  /// Creates a [PlacesService].
+  ///
+  /// [apiKey] is required. [baseUrl] sets an optional proxy host. [httpClient]
+  /// allows injecting a custom HTTP client (useful for testing).
   PlacesService({
     required this.apiKey,
     this.baseUrl,
@@ -57,10 +74,8 @@ class PlacesService {
   })  : _client = httpClient ?? http.Client(),
         _apiHeaders = apiHeaders ?? const {};
 
+  /// Google Maps API key used to authenticate Places API requests.
   final String apiKey;
-
-  /// Optional proxy base URL. When set, every request will use this URL as the
-  /// host instead of `https://places.googleapis.com`.
   final String? baseUrl;
 
   final http.Client _client;

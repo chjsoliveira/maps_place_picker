@@ -10,7 +10,12 @@ import 'package:maps_place_picker/src/models/prediction.dart';
 import 'package:maps_place_picker/src/services/places_service.dart';
 import 'package:provider/provider.dart';
 
+/// A search bar widget that fetches and displays autocomplete predictions.
+///
+/// Connects to [PlaceProvider] and [SearchProvider] via [Provider] to share
+/// the current search term and debounce timer.
 class AutoCompleteSearch extends StatefulWidget {
+  /// Creates an [AutoCompleteSearch].
   const AutoCompleteSearch(
       {super.key,
       required this.sessionToken,
@@ -37,26 +42,67 @@ class AutoCompleteSearch extends StatefulWidget {
       this.voiceSearchEnabled = false,
       this.onVoiceSearchTapped});
 
+  /// Session token used to group autocomplete and detail requests for billing.
   final String? sessionToken;
+
+  /// Hint text shown in the empty search field.
   final String? hintText;
+
+  /// Text shown while an autocomplete request is in flight.
   final String? searchingText;
+
+  /// When `true` the search bar is replaced by an empty [Container].
   final bool hidden;
+
+  /// Height of the search bar widget.
   final double height;
+
+  /// Inner padding of the search field.
   final EdgeInsetsGeometry contentPadding;
+
+  /// Debounce delay in milliseconds between keystrokes and API requests.
   final int? debounceMilliseconds;
+
+  /// Called when the user taps a prediction from the overlay list.
   final ValueChanged<Prediction> onPicked;
+
+  /// Called with the API status string when an autocomplete request fails.
   final ValueChanged<String>? onSearchFailed;
+
+  /// Controller that exposes programmatic control over the search bar.
   final SearchBarController searchBarController;
+
+  /// Character offset passed to the autocomplete API.
   final num? autocompleteOffset;
+
+  /// Search radius in metres passed to the autocomplete API.
   final num? autocompleteRadius;
+
+  /// BCP-47 language code for localising autocomplete results.
   final String? autocompleteLanguage;
+
+  /// Place-type filters for the autocomplete request.
   final List<String>? autocompleteTypes;
+
+  /// Country (or other component) filters for the autocomplete request.
   final List<Component>? autocompleteComponents;
+
+  /// When `true`, restricts results to the radius circle.
   final bool? strictbounds;
+
+  /// CLDR two-character region code used to bias autocomplete results.
   final String? region;
+
+  /// Key used to read the [AppBar]'s position for overlay placement.
   final GlobalKey appBarKey;
+
+  /// Initial text pre-filled in the search field.
   final String? initialSearchString;
+
+  /// Whether to immediately search for [initialSearchString] on first render.
   final bool? searchForInitialValue;
+
+  /// Whether to trigger autocomplete when the query ends with a whitespace.
   final bool? autocompleteOnTrailingWhitespace;
 
   /// Whether to show a microphone button for voice search input.
@@ -76,6 +122,10 @@ class AutoCompleteSearch extends StatefulWidget {
   AutoCompleteSearchState createState() => AutoCompleteSearchState();
 }
 
+/// The [State] for [AutoCompleteSearch].
+///
+/// Exposed as a public class so that [SearchBarController] can call methods on
+/// it directly.
 class AutoCompleteSearchState extends State<AutoCompleteSearch> {
   TextEditingController controller = TextEditingController();
   FocusNode focus = FocusNode();
@@ -193,7 +243,7 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
         });
   }
 
-  _onSearchInputChange() {
+  void _onSearchInputChange() {
     if (!mounted) return;
     provider.searchTerm = controller.text;
 
@@ -226,14 +276,14 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
     });
   }
 
-  _onFocusChanged() {
+  void _onFocusChanged() {
     PlaceProvider placeProvider = PlaceProvider.of(context, listen: false);
     placeProvider.isSearchBarFocused = focus.hasFocus;
     placeProvider.debounceTimer?.cancel();
     placeProvider.placeSearchingState = SearchingState.idle;
   }
 
-  _searchPlace(String searchTerm) {
+  void _searchPlace(String searchTerm) {
     provider.prevSearchTerm = searchTerm;
 
     _clearOverlay();
@@ -245,7 +295,7 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
     _performAutoCompleteSearch(searchTerm);
   }
 
-  _clearOverlay() {
+  void _clearOverlay() {
     if (overlayEntry != null) {
       try {
         overlayEntry!.remove();
@@ -254,7 +304,7 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
     }
   }
 
-  _displayOverlay(Widget overlayChild) {
+  void _displayOverlay(Widget overlayChild) {
     _clearOverlay();
 
     final RenderBox? appBarRenderBox =
@@ -337,7 +387,7 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
     );
   }
 
-  _performAutoCompleteSearch(String searchTerm) async {
+  Future<void> _performAutoCompleteSearch(String searchTerm) async {
     PlaceProvider provider = PlaceProvider.of(context, listen: false);
 
     if (searchTerm.isNotEmpty) {
@@ -368,17 +418,17 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
     }
   }
 
-  clearText() {
+  void clearText() {
     provider.searchTerm = "";
     controller.clear();
   }
 
-  resetSearchBar() {
+  void resetSearchBar() {
     clearText();
     focus.unfocus();
   }
 
-  clearOverlay() {
+  void clearOverlay() {
     _clearOverlay();
   }
 }
