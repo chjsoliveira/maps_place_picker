@@ -200,6 +200,16 @@ See the `example/` directory for a complete demo application.
 | `onCameraMove` | `CameraPositionCallback?` | — | Camera moving callback |
 | `onCameraIdle` | `Function(PlaceProvider)?` | — | Camera settled callback |
 | `onTapBack` | `VoidCallback?` | — | Override back button behaviour |
+| `showSearchBar` | `bool` | `true` | Show the autocomplete search bar; set to `false` for pure pin-drag mode |
+| `selectedPlaceButtonColor` | `Color?` | `Colors.lightGreen` | Override color of the "Select here" button when the pin is inside `pickArea` |
+| `initialZoom` | `double` | `15.0` | Initial camera zoom level |
+| `initialTilt` | `double` | `0.0` | Initial camera tilt in degrees |
+| `initialBearing` | `double` | `0.0` | Initial camera bearing in degrees clockwise from north |
+| `voiceSearchEnabled` | `bool` | `false` | Show a microphone button in the search bar; consumer handles speech recognition |
+| `onVoiceSearchTapped` | `VoidCallback?` | — | Called when the microphone button is tapped (requires `voiceSearchEnabled: true`) |
+| `markers` | `Set<Marker>?` | — | Extra markers to display on the map alongside the built-in draggable pin |
+| `polylines` | `Set<Polyline>?` | — | Polylines to overlay on the map |
+| `polygons` | `Set<Polygon>?` | — | Polygons to overlay on the map |
 
 ## Migrating from `google_maps_place_picker` / `google_maps_place_picker_mb`
 
