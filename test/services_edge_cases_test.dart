@@ -10,7 +10,11 @@ import 'package:maps_place_picker/src/services/places_service.dart';
 // ─────────────────────────── helpers ──────────────────────────────────────
 
 http.Client _mockClient(int statusCode, Map<String, dynamic> body) =>
-    MockClient((_) async => http.Response(jsonEncode(body), statusCode));
+    MockClient((_) async => http.Response(
+          jsonEncode(body),
+          statusCode,
+          headers: {'content-type': 'application/json; charset=utf-8'},
+        ));
 
 /// A client that always throws a [SocketException]-like error.
 http.Client _throwingClient() =>
@@ -269,7 +273,7 @@ void main() {
               'close': {'day': 1, 'hour': 18, 'minute': 0},
             }
           ],
-          'weekdayDescriptions': ['Monday: 9 AM – 6 PM'],
+          'weekdayDescriptions': ['Monday: 9 AM - 6 PM'],
         },
       });
 
