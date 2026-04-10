@@ -16,6 +16,7 @@
 ///   ),
 /// );
 /// ```
+library;
 
 export 'src/models/pick_result.dart';
 export 'src/models/component.dart';
