@@ -76,6 +76,16 @@ class PlacePicker extends StatefulWidget {
     this.onMapTypeChanged,
     this.zoomGesturesEnabled = true,
     this.zoomControlsEnabled = false,
+    this.showSearchBar = true,
+    this.selectedPlaceButtonColor,
+    this.initialZoom = 15.0,
+    this.initialTilt = 0.0,
+    this.initialBearing = 0.0,
+    this.voiceSearchEnabled = false,
+    this.onVoiceSearchTapped,
+    this.markers,
+    this.polylines,
+    this.polygons,
   });
 
   final String apiKey;
@@ -234,6 +244,48 @@ class PlacePicker extends StatefulWidget {
   /// Allow user to make visible the zoom button
   final bool zoomControlsEnabled;
 
+  /// Whether to show the search bar. Defaults to `true`.
+  ///
+  /// When `false`, the autocomplete search field is hidden but the back button
+  /// in the AppBar is still shown. This is useful when you want to provide
+  /// your own search UI or use the picker in pure pin-drag mode.
+  final bool showSearchBar;
+
+  /// Optional override colour for the "Select here" button when the selected
+  /// location is inside the [pickArea]. Defaults to [Colors.lightGreen].
+  final Color? selectedPlaceButtonColor;
+
+  /// Initial camera zoom level. Defaults to `15.0`.
+  final double initialZoom;
+
+  /// Initial camera tilt in degrees. Defaults to `0.0`.
+  final double initialTilt;
+
+  /// Initial camera bearing in degrees clockwise from north. Defaults to `0.0`.
+  final double initialBearing;
+
+  /// Whether to show a microphone button for voice input. Defaults to `false`.
+  ///
+  /// When `true`, a mic icon appears in the search bar. Tapping it calls
+  /// [onVoiceSearchTapped]. The consumer handles speech recognition and feeds
+  /// results back via [SearchBarController.setText].
+  final bool voiceSearchEnabled;
+
+  /// Called when the microphone button is tapped.
+  ///
+  /// Only invoked when [voiceSearchEnabled] is `true`.
+  final VoidCallback? onVoiceSearchTapped;
+
+  /// Optional set of [Marker]s to display on the map in addition to the
+  /// built-in draggable pin.
+  final Set<Marker>? markers;
+
+  /// Optional set of [Polyline]s to overlay on the map.
+  final Set<Polyline>? polylines;
+
+  /// Optional set of [Polygon]s to overlay on the map.
+  final Set<Polygon>? polygons;
+
   @override
   State<PlacePicker> createState() => _PlacePickerState();
 }
@@ -376,6 +428,7 @@ class _PlacePickerState extends State<PlacePicker> {
               sessionToken: provider!.sessionToken,
               hintText: widget.hintText,
               searchingText: widget.searchingText,
+              hidden: !widget.showSearchBar,
               debounceMilliseconds: widget.autoCompleteDebounceInMilliseconds,
               onPicked: (prediction) {
                 if (mounted) {
@@ -397,7 +450,9 @@ class _PlacePickerState extends State<PlacePicker> {
               initialSearchString: widget.initialSearchString,
               searchForInitialValue: widget.searchForInitialValue,
               autocompleteOnTrailingWhitespace:
-                  widget.autocompleteOnTrailingWhitespace),
+                  widget.autocompleteOnTrailingWhitespace,
+              voiceSearchEnabled: widget.voiceSearchEnabled,
+              onVoiceSearchTapped: widget.onVoiceSearchTapped),
         ),
         const SizedBox(width: 5),
       ],
@@ -530,6 +585,13 @@ class _PlacePickerState extends State<PlacePicker> {
       onCameraIdle: widget.onCameraIdle,
       zoomGesturesEnabled: widget.zoomGesturesEnabled,
       zoomControlsEnabled: widget.zoomControlsEnabled,
+      selectedPlaceButtonColor: widget.selectedPlaceButtonColor,
+      initialZoom: widget.initialZoom,
+      initialTilt: widget.initialTilt,
+      initialBearing: widget.initialBearing,
+      markers: widget.markers,
+      polylines: widget.polylines,
+      polygons: widget.polygons,
     );
   }
 

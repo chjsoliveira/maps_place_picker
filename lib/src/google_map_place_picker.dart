@@ -58,6 +58,13 @@ class GoogleMapPlacePicker extends StatelessWidget {
     this.zoomGesturesEnabled = true,
     this.zoomControlsEnabled = false,
     this.fullMotion = false,
+    this.selectedPlaceButtonColor,
+    this.initialZoom,
+    this.initialTilt,
+    this.initialBearing,
+    this.markers,
+    this.polylines,
+    this.polygons,
   });
 
   final LatLng initialTarget;
@@ -103,6 +110,29 @@ class GoogleMapPlacePicker extends StatelessWidget {
 
   /// Use never scrollable scroll-view with maximum dimensions to prevent unnecessary re-rendering.
   final bool fullMotion;
+
+  /// Optional override for the "Select here" button colour when the selected
+  /// location is within the pick area. Defaults to [Colors.lightGreen].
+  final Color? selectedPlaceButtonColor;
+
+  /// Initial camera zoom level. Defaults to `15.0`.
+  final double? initialZoom;
+
+  /// Initial camera tilt in degrees. Defaults to `0.0`.
+  final double? initialTilt;
+
+  /// Initial camera bearing in degrees. Defaults to `0.0`.
+  final double? initialBearing;
+
+  /// Optional set of [Marker]s to display on the map in addition to the
+  /// built-in pin.
+  final Set<Marker>? markers;
+
+  /// Optional set of [Polyline]s to overlay on the map.
+  final Set<Polyline>? polylines;
+
+  /// Optional set of [Polygon]s to overlay on the map.
+  final Set<Polygon>? polygons;
 
   _searchByCameraLocation(PlaceProvider provider) async {
     // Guard: map must be ready before searching.
@@ -233,8 +263,12 @@ class GoogleMapPlacePicker extends StatelessWidget {
   }
 
   Widget _buildGoogleMapInner(PlaceProvider provider, MapType mapType) {
-    CameraPosition initialCameraPosition =
-        CameraPosition(target: initialTarget, zoom: 15);
+    CameraPosition initialCameraPosition = CameraPosition(
+      target: initialTarget,
+      zoom: initialZoom ?? 15.0,
+      tilt: initialTilt ?? 0.0,
+      bearing: initialBearing ?? 0.0,
+    );
     return GoogleMap(
       zoomGesturesEnabled: zoomGesturesEnabled,
       zoomControlsEnabled:
@@ -248,6 +282,9 @@ class GoogleMapPlacePicker extends StatelessWidget {
       circles: pickArea != null && pickArea!.radius > 0
           ? <Circle>{pickArea!}
           : <Circle>{},
+      markers: markers ?? const <Marker>{},
+      polylines: polylines ?? const <Polyline>{},
+      polygons: polygons ?? const <Polygon>{},
       onMapCreated: (GoogleMapController controller) {
         provider.mapController = controller;
         provider.setCameraPosition(null);
@@ -288,6 +325,17 @@ class GoogleMapPlacePicker extends StatelessWidget {
               _searchByCameraLocation(provider);
             });
           }
+        } else if (provider.pinState == PinState.dragging &&
+            provider.cameraPosition != null) {
+          // F12: when pin pointing search is disabled, expose the raw
+          // camera lat/lng as a minimal PickResult so the floating card
+          // and "Select here" button become visible.
+          final double pinLat = provider.cameraPosition!.target.latitude;
+          final double pinLng = provider.cameraPosition!.target.longitude;
+          provider.selectedPlace = PickResult(
+            geometry: Geometry(location: Location(lat: pinLat, lng: pinLng)),
+          );
+          provider.placeSearchingState = SearchingState.idle;
         }
         provider.pinState = PinState.idle;
         onCameraIdle?.call(provider);
@@ -544,7 +592,9 @@ class GoogleMapPlacePicker extends StatelessWidget {
                     result.geometry!.location.lng) <=
                 pickArea!.radius);
     WidgetStateColor buttonColor = WidgetStateColor.resolveWith(
-        (states) => canBePicked ? Colors.lightGreen : Colors.red);
+        (states) => canBePicked
+            ? (selectedPlaceButtonColor ?? Colors.lightGreen)
+            : Colors.red);
     return Container(
       margin: const EdgeInsets.all(10),
       child: Column(

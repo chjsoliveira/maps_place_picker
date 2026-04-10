@@ -137,6 +137,89 @@ void main() {
     });
   });
 
+  // ─────────────────── PlacesService.searchNearby tests ──────────────────
+
+  group('PlacesService.searchNearby', () {
+    test('returns predictions on 200 response', () async {
+      final client = _mockClient(200, {
+        'places': [
+          {
+            'id': 'place1',
+            'displayName': {'text': 'Coffee Shop', 'languageCode': 'en'},
+            'formattedAddress': '1 Main St',
+          },
+          {
+            'id': 'place2',
+            'displayName': {'text': 'Bakery', 'languageCode': 'en'},
+            'formattedAddress': '2 Main St',
+          },
+        ]
+      });
+
+      final service = PlacesService(apiKey: 'key', httpClient: client);
+      final response = await service.searchNearby(37.422, -122.084);
+
+      expect(response.status, 'OK');
+      expect(response.predictions.length, 2);
+      expect(response.predictions[0].placeId, 'place1');
+      expect(response.predictions[0].description, 'Coffee Shop');
+      expect(response.predictions[1].placeId, 'place2');
+      expect(response.predictions[1].description, 'Bakery');
+    });
+
+    test('returns REQUEST_DENIED on 403 response', () async {
+      final client = _mockClient(403, {
+        'error': {'message': 'API key invalid', 'code': 403}
+      });
+
+      final service = PlacesService(apiKey: 'key', httpClient: client);
+      final response = await service.searchNearby(0.0, 0.0);
+
+      expect(response.status, 'REQUEST_DENIED');
+      expect(response.predictions, isEmpty);
+    });
+
+    test('returns empty predictions when places list is empty', () async {
+      final client = _mockClient(200, {'places': []});
+
+      final service = PlacesService(apiKey: 'key', httpClient: client);
+      final response = await service.searchNearby(0.0, 0.0);
+
+      expect(response.status, 'OK');
+      expect(response.predictions, isEmpty);
+    });
+
+    test('sends correct radius and language parameters', () async {
+      Map<String, dynamic>? capturedBody;
+      final client = MockClient((request) async {
+        capturedBody = jsonDecode(request.body) as Map<String, dynamic>;
+        return http.Response(jsonEncode({'places': []}), 200);
+      });
+
+      final service = PlacesService(apiKey: 'key', httpClient: client);
+      await service.searchNearby(
+        10.0,
+        20.0,
+        radius: 1000.0,
+        language: 'en',
+        types: ['restaurant'],
+        maxResults: 5,
+      );
+
+      final restriction = capturedBody!['locationRestriction']
+          as Map<String, dynamic>;
+      final circle = restriction['circle'] as Map<String, dynamic>;
+      final center = circle['center'] as Map<String, dynamic>;
+
+      expect(center['latitude'], 10.0);
+      expect(center['longitude'], 20.0);
+      expect(circle['radius'], 1000.0);
+      expect(capturedBody!['languageCode'], 'en');
+      expect(capturedBody!['includedTypes'], ['restaurant']);
+      expect(capturedBody!['maxResultCount'], 5);
+    });
+  });
+
   group('PlacesService.getDetailsByPlaceId', () {
     test('returns place details on 200 response', () async {
       final client = _mockClient(200, {

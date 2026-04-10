@@ -253,6 +253,114 @@ class PlacesService {
     }
   }
 
+  // ─────────────────────────── Nearby Search ─────────────────────────────
+
+  /// Searches for places near a given location using the Places API (New)
+  /// Nearby Search endpoint.
+  ///
+  /// [latitude] and [longitude] define the center of the search area.
+  /// [radius] is the search radius in metres (default 500 m).
+  /// [language] is the optional BCP-47 language code for result localisation.
+  /// [types] is an optional list of place types to filter by (e.g.
+  /// `["restaurant", "cafe"]`).
+  /// [maxResults] caps the number of results returned (default 10).
+  ///
+  /// Returns a [PlacesAutocompleteResponse] where each [Prediction] has
+  /// [Prediction.placeId] set to the place's ID and [Prediction.description]
+  /// set to the place's display name.
+  ///
+  /// Example:
+  /// ```dart
+  /// final response = await places.searchNearby(37.422, -122.084,
+  ///     radius: 1000, types: ['restaurant']);
+  /// for (final p in response.predictions) {
+  ///   print('${p.description} (${p.placeId})');
+  /// }
+  /// ```
+  Future<PlacesAutocompleteResponse> searchNearby(
+    double latitude,
+    double longitude, {
+    double radius = 500.0,
+    String? language,
+    List<String>? types,
+    int maxResults = 10,
+  }) async {
+    try {
+      final body = <String, dynamic>{
+        'locationRestriction': {
+          'circle': {
+            'center': {'latitude': latitude, 'longitude': longitude},
+            'radius': radius,
+          },
+        },
+        'maxResultCount': maxResults,
+        if (language != null) 'languageCode': language,
+        if (types != null && types.isNotEmpty) 'includedTypes': types,
+      };
+
+      const fieldMask =
+          'places.id,'
+          'places.displayName,'
+          'places.formattedAddress';
+
+      final uri = Uri.parse('$_base/v1/places:searchNearby');
+      final response = await _client.post(
+        uri,
+        headers: _headers(fieldMask: fieldMask),
+        body: jsonEncode(body),
+      );
+
+      return _parseNearbySearchResponse(response);
+    } catch (e) {
+      return PlacesAutocompleteResponse(
+        status: 'NETWORK_ERROR',
+        predictions: const [],
+        errorMessage: e.toString(),
+      );
+    }
+  }
+
+  PlacesAutocompleteResponse _parseNearbySearchResponse(
+      http.Response response) {
+    if (response.statusCode != 200) {
+      String? errorMsg;
+      try {
+        final body = jsonDecode(response.body) as Map<String, dynamic>;
+        errorMsg =
+            (body['error'] as Map<String, dynamic>?)?['message'] as String?;
+      } catch (_) {}
+      return PlacesAutocompleteResponse(
+        status: 'REQUEST_DENIED',
+        predictions: const [],
+        errorMessage: errorMsg ?? 'HTTP ${response.statusCode}',
+      );
+    }
+
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    final places = body['places'] as List<dynamic>? ?? const [];
+
+    final predictions = places
+        .map((p) {
+          final place = p as Map<String, dynamic>;
+          final id = place['id'] as String?;
+          if (id == null) return null;
+          final displayName =
+              (place['displayName'] as Map<String, dynamic>?)?['text']
+                  as String?;
+          return Prediction(
+            placeId: id,
+            description: displayName,
+          );
+        })
+        .whereType<Prediction>()
+        .toList();
+
+    return PlacesAutocompleteResponse(
+      status: 'OK',
+      predictions: predictions,
+    );
+  }
+
   PlacesDetailsResponse _parsePlaceDetailsResponse(http.Response response) {
     if (response.statusCode != 200) {
       String? errorMsg;

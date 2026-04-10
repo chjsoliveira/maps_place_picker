@@ -55,6 +55,38 @@ class PickResult {
   final String? website;
   final List<Review>? reviews;
 
+  // ──────────────────────── Convenience getters ──────────────────────────
+
+  /// The street number component of the address, or `null` if not present.
+  ///
+  /// Returns the `longName` of the first [AddressComponent] whose [types]
+  /// contains `"street_number"`. Returns `null` when [addressComponents] is
+  /// `null` or no matching component exists.
+  String? get streetNumber {
+    if (addressComponents == null) return null;
+    for (final c in addressComponents!) {
+      if (c.types.contains('street_number') && c.longName.isNotEmpty) {
+        return c.longName;
+      }
+    }
+    return null;
+  }
+
+  /// The postal code component of the address, or `null` if not present.
+  ///
+  /// Returns the `longName` of the first [AddressComponent] whose [types]
+  /// contains `"postal_code"`. Returns `null` when [addressComponents] is
+  /// `null` or no matching component exists.
+  String? get postalCode {
+    if (addressComponents == null) return null;
+    for (final c in addressComponents!) {
+      if (c.types.contains('postal_code') && c.longName.isNotEmpty) {
+        return c.longName;
+      }
+    }
+    return null;
+  }
+
   /// Creates a [PickResult] from a reverse-geocoding [GeocodingResult].
   ///
   /// [cameraLat] and [cameraLng] are the exact pin position from the map

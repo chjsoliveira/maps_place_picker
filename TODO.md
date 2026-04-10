@@ -100,4 +100,4 @@ Story point scale: 1 = trivial · 2 = simple · 3 = moderate · 5 = complex · 8
 | D8 | `WidgetsBinding` null-aware warning fixed (upstream #173) |
 | D9 | `geolocator` updated to `^14.0.2` (upstream #163, #185) |
 | M7 | `permission_handler` replaced with `geolocator` (upstream PR #88) |
-| M8 | `package_info_plus` updated to `^9.0.0` (upstream #165) |
+| M8 | `package_info_plus` removed from library dependencies (was unused; moved to example only if needed) |

@@ -21,4 +21,14 @@ class SearchBarController extends ChangeNotifier {
   clearOverlay() {
     _autoCompleteSearch.clearOverlay();
   }
+
+  /// Programmatically sets the search text (e.g. from a voice recognition
+  /// result).
+  ///
+  /// The cursor is positioned at the end of [text].
+  void setText(String text) {
+    _autoCompleteSearch.controller.text = text;
+    _autoCompleteSearch.controller.selection =
+        TextSelection.collapsed(offset: text.length);
+  }
 }
