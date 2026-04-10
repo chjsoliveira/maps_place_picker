@@ -12,7 +12,7 @@ which itself derives from [fysoul17/google_maps_place_picker](https://github.com
 - `PickResult` fields `id`, `reference`, `icon`, `scope`, and `utcOffset` have been
   removed — they mapped to deprecated Places API v1 fields with no equivalent in the
   Places API (New). `url` is now `googleMapsUri`.
-- Minimum Flutter SDK: **3.38.0** (Dart 3.9.2).
+- Minimum Flutter SDK: **3.27.0** (Dart 3.6.0).
 
 ### Features
 
