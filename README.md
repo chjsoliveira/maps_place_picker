@@ -201,7 +201,7 @@ See the `example/` directory for a complete demo application.
 | `onCameraIdle` | `Function(PlaceProvider)?` | — | Camera settled callback |
 | `onTapBack` | `VoidCallback?` | — | Override back button behaviour |
 | `showSearchBar` | `bool` | `true` | Show the autocomplete search bar; set to `false` for pure pin-drag mode |
-| `selectedPlaceButtonColor` | `Color?` | `Colors.lightGreen` | Override colour of the "Select here" button when the pin is inside `pickArea` |
+| `selectedPlaceButtonColor` | `Color?` | `Colors.lightGreen` | Override color of the "Select here" button when the pin is inside `pickArea` |
 | `initialZoom` | `double` | `15.0` | Initial camera zoom level |
 | `initialTilt` | `double` | `0.0` | Initial camera tilt in degrees |
 | `initialBearing` | `double` | `0.0` | Initial camera bearing in degrees clockwise from north |
