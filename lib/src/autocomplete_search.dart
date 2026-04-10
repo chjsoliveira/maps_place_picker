@@ -271,17 +271,25 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
         // B14: keep the overlay above the on-screen keyboard.
         final double keyboardHeight =
             MediaQuery.of(context).viewInsets.bottom;
+        final double screenHeight = MediaQuery.of(context).size.height;
+        // Limit the overlay height so it only takes the space its content
+        // needs, while still being scrollable and never exceeding the
+        // available space above the keyboard.
+        final double maxHeight =
+            screenHeight - overlayTop - keyboardHeight - 16;
         return Positioned(
           top: overlayTop,
           left: screenWidth * 0.025,
           right: screenWidth * 0.025,
-          bottom: keyboardHeight,
-          child: Material(
-            elevation: 4.0,
-            color: Theme.of(context).cardColor,
-            child: DefaultTextStyle(
-              style: Theme.of(context).textTheme.bodyMedium!,
-              child: SingleChildScrollView(child: overlayChild),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: maxHeight.clamp(0, double.infinity)),
+            child: Material(
+              elevation: 4.0,
+              color: Theme.of(context).cardColor,
+              child: DefaultTextStyle(
+                style: Theme.of(context).textTheme.bodyMedium!,
+                child: SingleChildScrollView(child: overlayChild),
+              ),
             ),
           ),
         );
