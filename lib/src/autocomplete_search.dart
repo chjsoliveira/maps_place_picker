@@ -33,7 +33,9 @@ class AutoCompleteSearch extends StatefulWidget {
       this.region,
       this.initialSearchString,
       this.searchForInitialValue,
-      this.autocompleteOnTrailingWhitespace});
+      this.autocompleteOnTrailingWhitespace,
+      this.voiceSearchEnabled = false,
+      this.onVoiceSearchTapped});
 
   final String? sessionToken;
   final String? hintText;
@@ -56,6 +58,19 @@ class AutoCompleteSearch extends StatefulWidget {
   final String? initialSearchString;
   final bool? searchForInitialValue;
   final bool? autocompleteOnTrailingWhitespace;
+
+  /// Whether to show a microphone button for voice search input.
+  ///
+  /// When `true`, a mic icon button is displayed after the clear icon.
+  /// Tapping it invokes [onVoiceSearchTapped]. The actual speech recognition
+  /// is handled by the consumer; feed the result back via
+  /// [SearchBarController.setText].
+  final bool voiceSearchEnabled;
+
+  /// Called when the microphone button is tapped.
+  ///
+  /// Only invoked when [voiceSearchEnabled] is `true`.
+  final VoidCallback? onVoiceSearchTapped;
 
   @override
   AutoCompleteSearchState createState() => AutoCompleteSearchState();
@@ -120,6 +135,13 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
                   const SizedBox(width: 10),
                   Expanded(child: _buildSearchTextField()),
                   _buildTextClearIcon(),
+                  if (widget.voiceSearchEnabled)
+                    IconButton(
+                      icon: const Icon(Icons.mic),
+                      onPressed: widget.onVoiceSearchTapped,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
                 ],
               ),
             ),
@@ -131,6 +153,7 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
     return TextField(
       controller: controller,
       focusNode: focus,
+      style: Theme.of(context).textTheme.bodyMedium,
       decoration: InputDecoration(
         hintText: widget.hintText,
         border: InputBorder.none,
@@ -255,7 +278,11 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
           bottom: keyboardHeight,
           child: Material(
             elevation: 4.0,
-            child: SingleChildScrollView(child: overlayChild),
+            color: Theme.of(context).cardColor,
+            child: DefaultTextStyle(
+              style: Theme.of(context).textTheme.bodyMedium!,
+              child: SingleChildScrollView(child: overlayChild),
+            ),
           ),
         );
       },

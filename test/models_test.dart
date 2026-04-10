@@ -232,5 +232,86 @@ void main() {
       expect(result.rating, 4.5);
       expect(result.website, 'https://example.com');
     });
+
+    // ── F14 ──────────────────────────────────────────────────────────────
+    group('streetNumber getter', () {
+      test('returns longName when street_number component is present', () {
+        final result = PickResult(
+          addressComponents: [
+            const AddressComponent(
+                longName: '42', shortName: '42', types: ['street_number']),
+            const AddressComponent(
+                longName: 'Main St',
+                shortName: 'Main St',
+                types: ['route']),
+          ],
+        );
+        expect(result.streetNumber, '42');
+      });
+
+      test('returns null when no street_number component', () {
+        final result = PickResult(
+          addressComponents: [
+            const AddressComponent(
+                longName: 'Main St',
+                shortName: 'Main St',
+                types: ['route']),
+          ],
+        );
+        expect(result.streetNumber, isNull);
+      });
+
+      test('returns null when addressComponents is null', () {
+        final result = PickResult();
+        expect(result.streetNumber, isNull);
+      });
+    });
+
+    group('postalCode getter', () {
+      test('returns longName when postal_code component is present', () {
+        final result = PickResult(
+          addressComponents: [
+            const AddressComponent(
+                longName: '10001',
+                shortName: '10001',
+                types: ['postal_code']),
+          ],
+        );
+        expect(result.postalCode, '10001');
+      });
+
+      test('returns null when no postal_code component', () {
+        final result = PickResult(
+          addressComponents: [
+            const AddressComponent(
+                longName: 'New York',
+                shortName: 'NY',
+                types: ['locality']),
+          ],
+        );
+        expect(result.postalCode, isNull);
+      });
+
+      test('returns null when addressComponents is null', () {
+        final result = PickResult();
+        expect(result.postalCode, isNull);
+      });
+
+      test('returns first match when multiple postal_code components', () {
+        final result = PickResult(
+          addressComponents: [
+            const AddressComponent(
+                longName: '10001',
+                shortName: '10001',
+                types: ['postal_code']),
+            const AddressComponent(
+                longName: '10002',
+                shortName: '10002',
+                types: ['postal_code']),
+          ],
+        );
+        expect(result.postalCode, '10001');
+      });
+    });
   });
 }

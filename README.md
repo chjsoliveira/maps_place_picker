@@ -18,6 +18,26 @@ which itself is a fork of
 
 ![Place Picker Preview](doc/preview.gif)
 
+## Platform Support
+
+| Platform | Support | Notes |
+|----------|---------|-------|
+| Android  | ✅ | Native Google Maps SDK via `google_maps_flutter` |
+| iOS      | ✅ | Native Google Maps SDK via `google_maps_flutter` |
+| Web      | ⚠️ | Requires adding `google_maps_flutter_web` to your **app's** `pubspec.yaml` dependencies. Some features may have limited parity with the native implementations. |
+| macOS    | ❌ | Not supported |
+| Linux    | ❌ | Not supported |
+| Windows  | ❌ | Not supported |
+
+> **Note:** This package is not a Flutter plugin — it is a regular package that
+> wraps `google_maps_flutter`. Platform support is therefore determined by the
+> underlying plugins. For web support, add the following to your app's
+> `pubspec.yaml`:
+> ```yaml
+> dependencies:
+>   google_maps_flutter_web: ^0.5.0
+> ```
+
 ## Features
 
 - Pick a place by dragging the map pin (reverse geocoding)
