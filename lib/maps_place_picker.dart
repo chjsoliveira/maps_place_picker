@@ -16,7 +16,7 @@
 ///   ),
 /// );
 /// ```
-library maps_place_picker;
+library;
 
 export 'src/models/pick_result.dart';
 export 'src/models/component.dart';
