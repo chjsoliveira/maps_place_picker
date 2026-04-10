@@ -70,18 +70,18 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
   @override
   void initState() {
     super.initState();
-    controller.addListener(_onSearchInputChange);
     if (widget.initialSearchString != null) {
+      // Add the listener only after setting the initial text so that
+      // assigning the pre-fill value does not trigger a debounce timer.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        // Remove the listener temporarily to avoid triggering a debounce
-        // timer when pre-filling the text field.
-        controller.removeListener(_onSearchInputChange);
         controller.text = widget.initialSearchString!;
         controller.addListener(_onSearchInputChange);
         if (widget.searchForInitialValue!) {
           _onSearchInputChange();
         }
       });
+    } else {
+      controller.addListener(_onSearchInputChange);
     }
     focus.addListener(_onFocusChanged);
 
