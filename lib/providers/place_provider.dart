@@ -247,8 +247,8 @@ class PlaceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// `true` when the initial search triggered by [selectInitialPosition] is
-  /// still pending (waiting for the first [onCameraIdle] after map creation).
+  /// `true` when the initial search triggered by `selectInitialPosition` is
+  /// still pending (waiting for the first `onCameraIdle` after map creation).
   bool pendingInitialSearch = false;
 
   @override

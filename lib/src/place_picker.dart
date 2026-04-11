@@ -201,7 +201,7 @@ class PlacePicker extends StatefulWidget {
   /// The section will be highlighted.
   final CircleArea? pickArea;
 
-  /// If true the [body] and the scaffold's floating widgets should size
+  /// If true the `body` and the scaffold's floating widgets should size
   /// themselves to avoid the onscreen keyboard whose height is defined by the
   /// ambient [MediaQuery]'s [MediaQueryData.viewInsets] `bottom` property.
   ///
