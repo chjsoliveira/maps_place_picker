@@ -2,7 +2,7 @@ name: maps_place_picker
 description: >-
   Flutter package for picking places on a Google Map — pin drag, autocomplete
   search, area restriction and dark mode. Actively maintained fork.
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/chjsoliveira/maps_place_picker
 repository: https://github.com/chjsoliveira/maps_place_picker
 issue_tracker: https://github.com/chjsoliveira/maps_place_picker/issues
