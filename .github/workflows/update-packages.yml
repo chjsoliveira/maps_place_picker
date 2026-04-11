@@ -1,0 +1,46 @@
+name: Update Flutter Packages
+
+on:
+  schedule:
+    - cron: '0 6 * * 1'  # Every Monday at 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-packages:
+    name: Update Packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Upgrade library dependencies
+        run: flutter pub upgrade
+
+      - name: Upgrade example dependencies
+        working-directory: example
+        run: flutter pub upgrade
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore(deps): weekly flutter pub upgrade'
+          branch: chore/weekly-package-update-${{ github.run_id }}
+          delete-branch: true
+          title: 'chore(deps): weekly Flutter package update'
+          body: |
+            Automated weekly update of Flutter dependencies via `flutter pub upgrade`.
+
+            Please review the changes and merge if all checks pass.
+          labels: dependencies
