@@ -2,6 +2,9 @@
 *.class
 *.lock
 *.log
+
+# Track Flutter dependency lock files for reproducible builds and automated updates
+!pubspec.lock
 *.pyc
 *.swp
 .buildlog/
