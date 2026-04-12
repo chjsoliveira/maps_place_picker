@@ -473,6 +473,7 @@ class _PlacePickerState extends State<PlacePicker> {
   }
 
   Future<PlaceProvider> _initPlaceProvider() async {
+    final assetBundle = DefaultAssetBundle.of(context);
     final headers = await const GoogleApiHeaders().getHeaders();
     final provider = PlaceProvider(
       widget.apiKey,
@@ -490,8 +491,7 @@ class _PlacePickerState extends State<PlacePicker> {
     }
     if (widget.mapStyleAssetPath != null) {
       try {
-        _mapStyle = await DefaultAssetBundle.of(context)
-            .loadString(widget.mapStyleAssetPath!);
+        _mapStyle = await assetBundle.loadString(widget.mapStyleAssetPath!);
       } catch (e) {
         debugPrint('PlacePicker: failed to load map style asset '
             '"${widget.mapStyleAssetPath}": $e');
