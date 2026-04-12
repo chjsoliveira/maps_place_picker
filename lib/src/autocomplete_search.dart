@@ -447,11 +447,11 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
 
         if (geoResponse.isOk && geoResponse.results.isNotEmpty) {
           final fallbackPredictions = geoResponse.results
+              .where((r) => r.placeId.isNotEmpty)
               .map((r) => Prediction(
-                    placeId: r.placeId.isNotEmpty ? r.placeId : null,
+                    placeId: r.placeId,
                     description: r.formattedAddress,
                   ))
-              .where((p) => p.placeId != null)
               .toList();
           if (fallbackPredictions.isNotEmpty) {
             _displayOverlay(_buildPredictionOverlay(fallbackPredictions));
