@@ -119,6 +119,14 @@ class PlacePicker extends StatefulWidget {
     this.markers,
     this.polylines,
     this.polygons,
+    this.mapStyleAssetPath,
+    this.minZoom,
+    this.maxZoom,
+    this.sessionToken,
+    this.onSessionTokenCreated,
+    this.geocodeOnTextFallback = false,
+    this.confirmAddressMinDistance,
+    this.addressUnavailableText,
   });
 
   /// Google Maps API key used for Places and Geocoding requests.
@@ -366,6 +374,76 @@ class PlacePicker extends StatefulWidget {
   /// Optional set of [Polygon]s to overlay on the map.
   final Set<Polygon>? polygons;
 
+  /// Asset path for a Google Maps JSON style file.
+  ///
+  /// When set, the file is loaded from the Flutter asset bundle during
+  /// initialisation and the resulting JSON is passed to [GoogleMap.style].
+  /// Include the asset in your `pubspec.yaml` under `flutter: assets:`.
+  ///
+  /// Example:
+  /// ```dart
+  /// PlacePicker(
+  ///   mapStyleAssetPath: 'assets/map_style.json',
+  ///   ...
+  /// )
+  /// ```
+  final String? mapStyleAssetPath;
+
+  /// Minimum camera zoom level passed to [GoogleMap.minMaxZoomPreference].
+  ///
+  /// Set both [minZoom] and [maxZoom] (or either alone) to constrain how far
+  /// the user can zoom in or out.
+  final double? minZoom;
+
+  /// Maximum camera zoom level passed to [GoogleMap.minMaxZoomPreference].
+  final double? maxZoom;
+
+  /// Optional session token to pass to the Places API.
+  ///
+  /// The Places API (New) uses session tokens to group autocomplete queries
+  /// and the subsequent details fetch into a single billable session. By
+  /// default the picker generates a fresh UUID token on every open. Supply
+  /// your own token here to reuse an existing session (e.g. across multiple
+  /// widget instances) and reduce API costs.
+  final String? sessionToken;
+
+  /// Called once during initialisation with the session token that will be
+  /// used for all Places API requests in this picker session.
+  ///
+  /// When [sessionToken] is provided by the caller, that same value is echoed
+  /// back here. When it is `null`, the picker generates a UUID and reports it
+  /// via this callback so the caller can store and reuse it in future sessions.
+  ///
+  /// ```dart
+  /// PlacePicker(
+  ///   onSessionTokenCreated: (token) => setState(() => _token = token),
+  ///   sessionToken: _token, // pass null on first open, reuse thereafter
+  ///   ...
+  /// )
+  /// ```
+  final ValueChanged<String>? onSessionTokenCreated;
+
+  /// When `true`, falls back to the Geocoding API (forward geocoding) when
+  /// Places Autocomplete returns no predictions for the current query.
+  ///
+  /// Defaults to `false`.
+  final bool geocodeOnTextFallback;
+
+  /// Minimum distance in metres from [initialPosition] required before the
+  /// "Select here" button becomes active.
+  ///
+  /// When non-null and greater than zero, the confirm button is rendered in
+  /// red (disabled) while the picked location is closer than this value to
+  /// [initialPosition]. Useful for enforcing that the user actually moves the
+  /// pin before confirming.
+  final double? confirmAddressMinDistance;
+
+  /// Text shown instead of `'Address unavailable'` when the geocoding API
+  /// cannot resolve a formatted address for the current pin position.
+  ///
+  /// Useful for translating the picker into languages other than English.
+  final String? addressUnavailableText;
+
   @override
   State<PlacePicker> createState() => _PlacePickerState();
 }
@@ -376,6 +454,9 @@ class _PlacePickerState extends State<PlacePicker> {
   PlaceProvider? provider;
   SearchBarController searchBarController = SearchBarController();
   bool showIntroModal = true;
+
+  /// Pre-loaded map style JSON string, or `null` when no style asset is set.
+  String? _mapStyle;
 
   @override
   void initState() {
@@ -399,12 +480,22 @@ class _PlacePickerState extends State<PlacePicker> {
       widget.httpClient,
       headers,
     );
-    provider.sessionToken = const Uuid().v4();
+    provider.sessionToken = widget.sessionToken ?? const Uuid().v4();
+    widget.onSessionTokenCreated?.call(provider.sessionToken!);
     provider.desiredAccuracy = widget.desiredLocationAccuracy;
     provider.setMapType(widget.initialMapType);
     if (widget.useCurrentLocation != null && widget.useCurrentLocation!) {
       await provider.updateCurrentLocation(
           gracefully: widget.ignoreLocationPermissionErrors);
+    }
+    if (widget.mapStyleAssetPath != null) {
+      try {
+        _mapStyle = await DefaultAssetBundle.of(context)
+            .loadString(widget.mapStyleAssetPath!);
+      } catch (e) {
+        debugPrint('PlacePicker: failed to load map style asset '
+            '"${widget.mapStyleAssetPath}": $e');
+      }
     }
     return provider;
   }
@@ -532,7 +623,8 @@ class _PlacePickerState extends State<PlacePicker> {
               autocompleteOnTrailingWhitespace:
                   widget.autocompleteOnTrailingWhitespace,
               voiceSearchEnabled: widget.voiceSearchEnabled,
-              onVoiceSearchTapped: widget.onVoiceSearchTapped),
+              onVoiceSearchTapped: widget.onVoiceSearchTapped,
+              geocodeOnTextFallback: widget.geocodeOnTextFallback),
         ),
         const SizedBox(width: 5),
       ],
@@ -672,6 +764,11 @@ class _PlacePickerState extends State<PlacePicker> {
       markers: widget.markers,
       polylines: widget.polylines,
       polygons: widget.polygons,
+      mapStyle: _mapStyle,
+      minZoom: widget.minZoom,
+      maxZoom: widget.maxZoom,
+      confirmAddressMinDistance: widget.confirmAddressMinDistance,
+      addressUnavailableText: widget.addressUnavailableText,
     );
   }
 

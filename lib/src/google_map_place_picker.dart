@@ -70,6 +70,11 @@ class GoogleMapPlacePicker extends StatelessWidget {
     this.markers,
     this.polylines,
     this.polygons,
+    this.mapStyle,
+    this.minZoom,
+    this.maxZoom,
+    this.confirmAddressMinDistance,
+    this.addressUnavailableText,
   });
 
   /// The initial map camera target position.
@@ -180,6 +185,32 @@ class GoogleMapPlacePicker extends StatelessWidget {
 
   /// Optional set of [Polygon]s to overlay on the map.
   final Set<Polygon>? polygons;
+
+  /// Pre-loaded map style JSON string (see [PlacePicker.mapStyleAssetPath]).
+  ///
+  /// When non-null, this string is passed directly to [GoogleMap.style].
+  final String? mapStyle;
+
+  /// Minimum camera zoom level. When set together with [maxZoom], both are
+  /// forwarded to [GoogleMap.minMaxZoomPreference].
+  final double? minZoom;
+
+  /// Maximum camera zoom level. See [minZoom].
+  final double? maxZoom;
+
+  /// Minimum distance in metres from [initialTarget] required before the
+  /// "Select here" button is enabled.
+  ///
+  /// When non-null and greater than zero, the confirm button is disabled
+  /// (shown in red with the blocking icon) whenever the picked location is
+  /// closer than this value to [initialTarget]. This prevents accidentally
+  /// confirming the default position without any meaningful map movement.
+  final double? confirmAddressMinDistance;
+
+  /// Text shown when [PickResult.formattedAddress] is null.
+  ///
+  /// Defaults to `'Address unavailable'` when not set.
+  final String? addressUnavailableText;
 
   Future<void> _searchByCameraLocation(PlaceProvider provider) async {
     // Guard: map must be ready before searching.
@@ -326,6 +357,10 @@ class GoogleMapPlacePicker extends StatelessWidget {
       initialCameraPosition: initialCameraPosition,
       mapType: mapType,
       myLocationEnabled: true,
+      style: mapStyle,
+      minMaxZoomPreference: (minZoom != null || maxZoom != null)
+          ? MinMaxZoomPreference(minZoom, maxZoom)
+          : MinMaxZoomPreference.unbounded,
       circles: pickArea != null && pickArea!.radius > 0
           ? <Circle>{pickArea!}
           : <Circle>{},
@@ -638,6 +673,24 @@ class GoogleMapPlacePicker extends StatelessWidget {
                     result.geometry!.location.lat,
                     result.geometry!.location.lng) <=
                 pickArea!.radius);
+
+    // confirmAddressMinDistance: require pin to be at least N metres from the
+    // initial camera target before enabling the confirm button.
+    if (canBePicked &&
+        confirmAddressMinDistance != null &&
+        confirmAddressMinDistance! > 0 &&
+        result.geometry != null) {
+      final double dist = Geolocator.distanceBetween(
+        initialTarget.latitude,
+        initialTarget.longitude,
+        result.geometry!.location.lat,
+        result.geometry!.location.lng,
+      );
+      if (dist < confirmAddressMinDistance!) {
+        canBePicked = false;
+      }
+    }
+
     WidgetStateColor buttonColor = WidgetStateColor.resolveWith(
         (states) => canBePicked
             ? (selectedPlaceButtonColor ?? Colors.lightGreen)
@@ -647,7 +700,9 @@ class GoogleMapPlacePicker extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Text(
-            result.formattedAddress ?? 'Address unavailable',
+            result.formattedAddress ??
+                addressUnavailableText ??
+                'Address unavailable',
             style: const TextStyle(fontSize: 18),
             textAlign: TextAlign.center,
           ),
