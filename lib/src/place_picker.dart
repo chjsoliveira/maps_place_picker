@@ -123,6 +123,7 @@ class PlacePicker extends StatefulWidget {
     this.minZoom,
     this.maxZoom,
     this.sessionToken,
+    this.onSessionTokenCreated,
     this.geocodeOnTextFallback = false,
     this.confirmAddressMinDistance,
     this.addressUnavailableText,
@@ -406,6 +407,22 @@ class PlacePicker extends StatefulWidget {
   /// widget instances) and reduce API costs.
   final String? sessionToken;
 
+  /// Called once during initialisation with the session token that will be
+  /// used for all Places API requests in this picker session.
+  ///
+  /// When [sessionToken] is provided by the caller, that same value is echoed
+  /// back here. When it is `null`, the picker generates a UUID and reports it
+  /// via this callback so the caller can store and reuse it in future sessions.
+  ///
+  /// ```dart
+  /// PlacePicker(
+  ///   onSessionTokenCreated: (token) => setState(() => _token = token),
+  ///   sessionToken: _token, // pass null on first open, reuse thereafter
+  ///   ...
+  /// )
+  /// ```
+  final ValueChanged<String>? onSessionTokenCreated;
+
   /// When `true`, falls back to the Geocoding API (forward geocoding) when
   /// Places Autocomplete returns no predictions for the current query.
   ///
@@ -464,6 +481,7 @@ class _PlacePickerState extends State<PlacePicker> {
       headers,
     );
     provider.sessionToken = widget.sessionToken ?? const Uuid().v4();
+    widget.onSessionTokenCreated?.call(provider.sessionToken!);
     provider.desiredAccuracy = widget.desiredLocationAccuracy;
     provider.setMapType(widget.initialMapType);
     if (widget.useCurrentLocation != null && widget.useCurrentLocation!) {
