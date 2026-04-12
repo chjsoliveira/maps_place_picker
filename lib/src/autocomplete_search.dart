@@ -6,6 +6,7 @@ import 'package:maps_place_picker/providers/place_provider.dart';
 import 'package:maps_place_picker/providers/search_provider.dart';
 import 'package:maps_place_picker/src/components/prediction_tile.dart';
 import 'package:maps_place_picker/src/controllers/autocomplete_search_controller.dart';
+import 'package:maps_place_picker/src/models/geocoding_result.dart';
 import 'package:maps_place_picker/src/models/prediction.dart';
 import 'package:maps_place_picker/src/services/geocoding_service.dart';
 import 'package:maps_place_picker/src/services/places_service.dart';
