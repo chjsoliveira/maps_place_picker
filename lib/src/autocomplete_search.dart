@@ -7,6 +7,7 @@ import 'package:maps_place_picker/providers/search_provider.dart';
 import 'package:maps_place_picker/src/components/prediction_tile.dart';
 import 'package:maps_place_picker/src/controllers/autocomplete_search_controller.dart';
 import 'package:maps_place_picker/src/models/prediction.dart';
+import 'package:maps_place_picker/src/services/geocoding_service.dart';
 import 'package:maps_place_picker/src/services/places_service.dart';
 import 'package:provider/provider.dart';
 
@@ -40,7 +41,8 @@ class AutoCompleteSearch extends StatefulWidget {
       this.searchForInitialValue,
       this.autocompleteOnTrailingWhitespace,
       this.voiceSearchEnabled = false,
-      this.onVoiceSearchTapped});
+      this.onVoiceSearchTapped,
+      this.geocodeOnTextFallback = false});
 
   /// Session token used to group autocomplete and detail requests for billing.
   final String? sessionToken;
@@ -117,6 +119,14 @@ class AutoCompleteSearch extends StatefulWidget {
   ///
   /// Only invoked when [voiceSearchEnabled] is `true`.
   final VoidCallback? onVoiceSearchTapped;
+
+  /// When `true`, falls back to the Geocoding API (forward geocoding) when the
+  /// Places Autocomplete API returns no predictions for the current query.
+  ///
+  /// Geocoding results are displayed in the same prediction overlay. Picking
+  /// one follows the same flow as a Places result (place-details fetch by
+  /// Place ID). Defaults to `false`.
+  final bool geocodeOnTextFallback;
 
   @override
   AutoCompleteSearchState createState() => AutoCompleteSearchState();
@@ -421,7 +431,36 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
         return;
       }
 
-      _displayOverlay(_buildPredictionOverlay(response.predictions));
+      if (response.predictions.isNotEmpty) {
+        _displayOverlay(_buildPredictionOverlay(response.predictions));
+        return;
+      }
+
+      // Geocoding fallback: when Places returns no predictions, try the
+      // Geocoding API (forward geocoding) as a last resort.
+      if (widget.geocodeOnTextFallback) {
+        final GeocodingResponse geoResponse =
+            await provider.geocoding.searchByAddress(
+          searchTerm,
+          language: widget.autocompleteLanguage,
+        );
+
+        if (geoResponse.isOk && geoResponse.results.isNotEmpty) {
+          final fallbackPredictions = geoResponse.results
+              .map((r) => Prediction(
+                    placeId: r.placeId.isNotEmpty ? r.placeId : null,
+                    description: r.formattedAddress,
+                  ))
+              .where((p) => p.placeId != null)
+              .toList();
+          if (fallbackPredictions.isNotEmpty) {
+            _displayOverlay(_buildPredictionOverlay(fallbackPredictions));
+            return;
+          }
+        }
+      }
+
+      _displayOverlay(_buildPredictionOverlay(const []));
     }
   }
 

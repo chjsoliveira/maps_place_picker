@@ -69,6 +69,43 @@ class GeocodingService {
     }
   }
 
+  /// Forward-geocodes [address] using the Geocoding API.
+  ///
+  /// Returns a [GeocodingResponse] whose [GeocodingResponse.results] can be
+  /// converted to [Prediction]s for display when the Places Autocomplete API
+  /// returns no suggestions (see `geocodeOnTextFallback`).
+  Future<GeocodingResponse> searchByAddress(
+    String address, {
+    String? language,
+  }) async {
+    try {
+      final queryParams = <String, String>{
+        'address': address,
+        'key': apiKey,
+        if (language != null) 'language': language,
+      };
+
+      final uri = Uri.parse('$_base/maps/api/geocode/json')
+          .replace(queryParameters: queryParams);
+
+      final response = await _client.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          ..._apiHeaders,
+        },
+      );
+
+      return _parseResponse(response);
+    } catch (e) {
+      return GeocodingResponse(
+        status: 'NETWORK_ERROR',
+        results: const [],
+        errorMessage: e.toString(),
+      );
+    }
+  }
+
   GeocodingResponse _parseResponse(http.Response response) {
     if (response.statusCode != 200) {
       return GeocodingResponse(
