@@ -1,3 +1,29 @@
+## [1.0.1] - 06/May/2026
+
+### Features
+
+- **`mapStyleAssetPath`** — load a custom Google Maps style from a JSON asset file.
+- **`minZoom` / `maxZoom`** — restrict the map's zoom range.
+- **`sessionToken`** — pass an explicit session token for Places Autocomplete billing.
+- **`onSessionTokenCreated`** — callback that exposes the effective session token used by the picker.
+- **`geocodeOnTextFallback`** — fall back to geocoding when autocomplete returns no results.
+- **`confirmAddressMinDistance`** — minimum distance (metres) the pin must move before the address label refreshes.
+- **`addressUnavailableText`** — custom string shown when reverse geocoding returns no result.
+
+### Bug fixes
+
+- Fixed `GeocodingResponse` undefined-class compile error introduced in v1.0.0.
+- Resolved `BuildContext` async-gap lint warnings in `place_picker.dart`.
+- Removed redundant `placeId` null-filter in the geocoding fallback path.
+- Removed unused `geocoding_service` import from `autocomplete_search.dart`.
+- Fixed remaining lint errors in `autocomplete_search.dart` and `place_picker.dart`.
+
+### CI / maintenance
+
+- Added a manual GitHub Actions workflow for version tagging and pub.dev publishing.
+- Added a weekly workflow that opens a PR to update Flutter dependencies automatically.
+- Upgraded `create-pull-request` action to v8 and `actions/checkout` to v6.
+
 ## [1.0.0] - 10/Apr/2026
 
 First publication to pub.dev.
