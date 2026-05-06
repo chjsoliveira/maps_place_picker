@@ -5,7 +5,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:maps_place_picker/providers/place_provider.dart';
 import 'package:maps_place_picker/src/place_picker.dart';
 import 'package:maps_place_picker/src/models/pick_result.dart';
-import 'package:maps_place_picker/src/models/geometry.dart';
 
 void main() {
   group('PlaceProvider – initial state', () {
@@ -76,11 +75,9 @@ void main() {
 
   group('PlaceProvider – state notifications', () {
     late PlaceProvider provider;
-    late List<String> notifiedProperties;
 
     setUp(() {
       provider = PlaceProvider('test_key', null, null, const {});
-      notifiedProperties = [];
     });
 
     tearDown(() => provider.dispose());
@@ -120,7 +117,7 @@ void main() {
 
       final place = PickResult(
         placeId: 'p1',
-        geometry: Geometry(location: Location(lat: 1.0, lng: 2.0)),
+        geometry: const Geometry(location: Location(lat: 1.0, lng: 2.0)),
         formattedAddress: 'Test Address',
       );
 

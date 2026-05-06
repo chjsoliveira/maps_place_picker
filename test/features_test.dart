@@ -9,9 +9,7 @@ import 'package:maps_place_picker/providers/place_provider.dart';
 import 'package:maps_place_picker/src/autocomplete_search.dart';
 import 'package:maps_place_picker/src/controllers/autocomplete_search_controller.dart';
 import 'package:maps_place_picker/src/google_map_place_picker.dart';
-import 'package:maps_place_picker/src/models/geometry.dart';
 import 'package:maps_place_picker/src/models/pick_result.dart';
-import 'package:maps_place_picker/src/models/prediction.dart';
 import 'package:maps_place_picker/src/place_picker.dart';
 import 'package:provider/provider.dart';
 
@@ -56,7 +54,7 @@ void main() {
   group('F12 – PickResult geometry-only construction', () {
     test('PickResult can be constructed with only geometry', () {
       final result = PickResult(
-        geometry: Geometry(location: Location(lat: 48.8566, lng: 2.3522)),
+        geometry: const Geometry(location: Location(lat: 48.8566, lng: 2.3522)),
       );
       expect(result.geometry!.location.lat, 48.8566);
       expect(result.geometry!.location.lng, 2.3522);

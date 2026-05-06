@@ -79,11 +79,9 @@ void main() {
     });
 
     test('uses locationRestriction when strictbounds=true (B11)', () async {
-      Uri? capturedUri;
       Map<String, dynamic>? capturedBody;
 
       final client = MockClient((request) async {
-        capturedUri = request.url;
         capturedBody = jsonDecode(request.body) as Map<String, dynamic>;
         return http.Response(jsonEncode({'suggestions': []}), 200);
       });

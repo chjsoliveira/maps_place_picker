@@ -1,8 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:maps_place_picker/src/models/address_component.dart';
-import 'package:maps_place_picker/src/models/geometry.dart';
 import 'package:maps_place_picker/src/models/geocoding_result.dart';
-import 'package:maps_place_picker/src/models/place_details.dart';
 import 'package:maps_place_picker/src/models/prediction.dart';
 import 'package:maps_place_picker/src/models/pick_result.dart';
 
@@ -184,7 +181,7 @@ void main() {
 
   group('PickResult', () {
     test('fromGeocodingResult uses camera position as authoritative location (B16)', () {
-      final geocodingResult = GeocodingResult(
+      final geocodingResult = const GeocodingResult(
         placeId: 'p1',
         geometry: Geometry(
           location: Location(lat: 0.0, lng: 0.0), // centroid
@@ -206,7 +203,7 @@ void main() {
     });
 
     test('fromGeocodingResult falls back to geocoding geometry when no camera position', () {
-      final geocodingResult = GeocodingResult(
+      final geocodingResult = const GeocodingResult(
         placeId: 'p2',
         geometry: Geometry(location: Location(lat: 1.0, lng: 2.0)),
         formattedAddress: 'Place',
