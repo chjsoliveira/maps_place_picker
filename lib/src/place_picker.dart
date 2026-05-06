@@ -491,7 +491,12 @@ class _PlacePickerState extends State<PlacePicker> {
     }
     if (widget.mapStyleAssetPath != null) {
       try {
-        _mapStyle = await assetBundle.loadString(widget.mapStyleAssetPath!);
+        final style = await assetBundle.loadString(widget.mapStyleAssetPath!);
+        // Guard against the widget being disposed while the asset was loading
+        // (e.g. the user dismissed the picker before initialization finished).
+        if (mounted) {
+          _mapStyle = style;
+        }
       } catch (e) {
         debugPrint('PlacePicker: failed to load map style asset '
             '"${widget.mapStyleAssetPath}": $e');

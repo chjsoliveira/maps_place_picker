@@ -1,3 +1,17 @@
+## [1.0.2] - 06/May/2026
+
+### Bug fixes
+
+- **Map style safety**: added `mounted` guard before assigning `_mapStyle` inside
+  `_initPlaceProvider()`. Previously, if the user dismissed the picker while the
+  asset was still being loaded (e.g. during a slow `useCurrentLocation` fetch),
+  `_mapStyle` could be written to a disposed `State`, causing a harmless but
+  unexpected mutation. The style string is now only stored when the widget is
+  still active, keeping style application safe and in line with Flutter best
+  practices. The non-deprecated `GoogleMap(style: ...)` constructor parameter
+  continues to be the sole mechanism for applying the style — `setMapStyle()`
+  is not used.
+
 ## [1.0.1] - 06/May/2026
 
 ### Features
@@ -107,7 +121,7 @@ which itself derives from [fysoul17/google_maps_place_picker](https://github.com
 
 ## [3.0.2] - 10/May/2023
 
-- Fix getting current location 
+- Fix getting current location
 - Upgrade `google_maps_flutter` package to 2.2.6
 
 ## [3.0.1] - 06/Feb/2023
