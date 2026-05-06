@@ -5,8 +5,8 @@ import 'package:maps_place_picker/src/models/geometry.dart';
 void main() {
   group('OpeningHoursPoint', () {
     test('fromJson parses day, hour, minute', () {
-      final point = OpeningHoursPoint.fromJson(
-          {'day': 1, 'hour': 9, 'minute': 30});
+      final point =
+          OpeningHoursPoint.fromJson({'day': 1, 'hour': 9, 'minute': 30});
       expect(point.day, 1);
       expect(point.hour, 9);
       expect(point.minute, 30);
@@ -169,7 +169,7 @@ void main() {
     });
 
     test('constructs with all fields', () {
-      final geo = const Geometry(location: Location(lat: 48.8566, lng: 2.3522));
+      const geo = Geometry(location: Location(lat: 48.8566, lng: 2.3522));
       final details = PlaceDetails(
         placeId: 'pd2',
         name: 'Paris',

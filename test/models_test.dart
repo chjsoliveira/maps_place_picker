@@ -12,8 +12,8 @@ void main() {
     });
 
     test('fromNewApiJson parses latitude/longitude keys', () {
-      final loc = Location.fromNewApiJson(
-          {'latitude': 37.422, 'longitude': -122.084});
+      final loc =
+          Location.fromNewApiJson({'latitude': 37.422, 'longitude': -122.084});
       expect(loc.lat, 37.422);
       expect(loc.lng, -122.084);
     });
@@ -35,8 +35,9 @@ void main() {
     });
 
     test('fromGeocodingJson handles missing viewport', () {
-      final geo = Geometry.fromGeocodingJson(
-          {'location': {'lat': 1.0, 'lng': 2.0}});
+      final geo = Geometry.fromGeocodingJson({
+        'location': {'lat': 1.0, 'lng': 2.0}
+      });
       expect(geo.viewport, isNull);
     });
 
@@ -166,7 +167,8 @@ void main() {
   group('PriceLevel', () {
     test('parsePriceLevel maps all string values', () {
       expect(parsePriceLevel('PRICE_LEVEL_FREE'), PriceLevel.free);
-      expect(parsePriceLevel('PRICE_LEVEL_INEXPENSIVE'), PriceLevel.inexpensive);
+      expect(
+          parsePriceLevel('PRICE_LEVEL_INEXPENSIVE'), PriceLevel.inexpensive);
       expect(parsePriceLevel('PRICE_LEVEL_MODERATE'), PriceLevel.moderate);
       expect(parsePriceLevel('PRICE_LEVEL_EXPENSIVE'), PriceLevel.expensive);
       expect(parsePriceLevel('PRICE_LEVEL_VERY_EXPENSIVE'),
@@ -180,8 +182,10 @@ void main() {
   });
 
   group('PickResult', () {
-    test('fromGeocodingResult uses camera position as authoritative location (B16)', () {
-      final geocodingResult = const GeocodingResult(
+    test(
+        'fromGeocodingResult uses camera position as authoritative location (B16)',
+        () {
+      const geocodingResult = GeocodingResult(
         placeId: 'p1',
         geometry: Geometry(
           location: Location(lat: 0.0, lng: 0.0), // centroid
@@ -202,8 +206,10 @@ void main() {
       expect(result.placeId, 'p1');
     });
 
-    test('fromGeocodingResult falls back to geocoding geometry when no camera position', () {
-      final geocodingResult = const GeocodingResult(
+    test(
+        'fromGeocodingResult falls back to geocoding geometry when no camera position',
+        () {
+      const geocodingResult = GeocodingResult(
         placeId: 'p2',
         geometry: Geometry(location: Location(lat: 1.0, lng: 2.0)),
         formattedAddress: 'Place',
@@ -238,9 +244,7 @@ void main() {
             const AddressComponent(
                 longName: '42', shortName: '42', types: ['street_number']),
             const AddressComponent(
-                longName: 'Main St',
-                shortName: 'Main St',
-                types: ['route']),
+                longName: 'Main St', shortName: 'Main St', types: ['route']),
           ],
         );
         expect(result.streetNumber, '42');
@@ -250,9 +254,7 @@ void main() {
         final result = PickResult(
           addressComponents: [
             const AddressComponent(
-                longName: 'Main St',
-                shortName: 'Main St',
-                types: ['route']),
+                longName: 'Main St', shortName: 'Main St', types: ['route']),
           ],
         );
         expect(result.streetNumber, isNull);
@@ -269,9 +271,7 @@ void main() {
         final result = PickResult(
           addressComponents: [
             const AddressComponent(
-                longName: '10001',
-                shortName: '10001',
-                types: ['postal_code']),
+                longName: '10001', shortName: '10001', types: ['postal_code']),
           ],
         );
         expect(result.postalCode, '10001');
@@ -281,9 +281,7 @@ void main() {
         final result = PickResult(
           addressComponents: [
             const AddressComponent(
-                longName: 'New York',
-                shortName: 'NY',
-                types: ['locality']),
+                longName: 'New York', shortName: 'NY', types: ['locality']),
           ],
         );
         expect(result.postalCode, isNull);
@@ -298,13 +296,9 @@ void main() {
         final result = PickResult(
           addressComponents: [
             const AddressComponent(
-                longName: '10001',
-                shortName: '10001',
-                types: ['postal_code']),
+                longName: '10001', shortName: '10001', types: ['postal_code']),
             const AddressComponent(
-                longName: '10002',
-                shortName: '10002',
-                types: ['postal_code']),
+                longName: '10002', shortName: '10002', types: ['postal_code']),
           ],
         );
         expect(result.postalCode, '10001');

@@ -14,6 +14,8 @@ import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platf
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  MyApp({super.key});
+
   // Light Theme
   final ThemeData lightTheme = ThemeData.light().copyWith(
     // Background color of the FloatingCard
@@ -41,7 +43,7 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  HomePage({Key? key}) : super(key: key);
+  HomePage({super.key});
 
   static const kInitialPosition = LatLng(-33.8567844, 151.213108);
 
@@ -49,7 +51,7 @@ class HomePage extends StatefulWidget {
       GoogleMapsFlutterPlatform.instance;
 
   @override
-  _HomePageState createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
@@ -124,10 +126,10 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: const Row(
                         children: [
-                          const Radio<String>(value: "auto"),
-                          const Text("Auto"),
-                          const Radio<String>(value: "latest"),
-                          const Text("Latest"),
+                          Radio<String>(value: "auto"),
+                          Text("Auto"),
+                          Radio<String>(value: "latest"),
+                          Text("Latest"),
                         ],
                       ),
                     ),
@@ -182,7 +184,7 @@ class _HomePageState extends State<HomePage> {
                         );
                       },
                     )
-                  : Container(),
+                  : const SizedBox.shrink(),
               !_showPlacePickerInContainer
                   ? ElevatedButton(
                       child: const Text("Load Place Picker in Container"),
@@ -193,7 +195,7 @@ class _HomePageState extends State<HomePage> {
                         });
                       },
                     )
-                  : Container(
+                  : SizedBox(
                       width: MediaQuery.of(context).size.width * 0.75,
                       height: MediaQuery.of(context).size.height * 0.35,
                       child: PlacePicker(
@@ -224,15 +226,14 @@ class _HomePageState extends State<HomePage> {
                           })),
               if (selectedPlace != null) ...[
                 Text(selectedPlace!.formattedAddress!),
-                Text("(lat: " +
-                    selectedPlace!.geometry!.location.lat.toString() +
-                    ", lng: " +
-                    selectedPlace!.geometry!.location.lng.toString() +
-                    ")"),
+                Text(
+                  '(lat: ${selectedPlace!.geometry!.location.lat}, '
+                  'lng: ${selectedPlace!.geometry!.location.lng})',
+                ),
               ],
               // #region Google Map Example without provider
               _showPlacePickerInContainer
-                  ? Container()
+                  ? const SizedBox.shrink()
                   : ElevatedButton(
                       child: const Text("Toggle Google Map w/o Provider"),
                       onPressed: () {
@@ -245,7 +246,7 @@ class _HomePageState extends State<HomePage> {
                     ),
               !_showGoogleMapInContainer
                   ? Container()
-                  : Container(
+                  : SizedBox(
                       width: MediaQuery.of(context).size.width * 0.75,
                       height: MediaQuery.of(context).size.height * 0.25,
                       child: GoogleMap(
@@ -262,7 +263,9 @@ class _HomePageState extends State<HomePage> {
                         onCameraMoveStarted: () {},
                         onCameraMove: (CameraPosition position) {},
                       )),
-              !_showGoogleMapInContainer ? Container() : const TextField(),
+              !_showGoogleMapInContainer
+                  ? const SizedBox.shrink()
+                  : const TextField(),
               // #endregion
             ],
           ),
