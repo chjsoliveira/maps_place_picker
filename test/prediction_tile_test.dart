@@ -14,7 +14,7 @@ void main() {
     }
 
     testWidgets('renders description text', (WidgetTester tester) async {
-      final prediction = const Prediction(
+      const prediction = Prediction(
         placeId: 'id1',
         description: 'Sydney, Australia',
         matchedSubstrings: [],
@@ -38,7 +38,7 @@ void main() {
 
     testWidgets('calls onTap when tapped', (WidgetTester tester) async {
       Prediction? tappedPrediction;
-      final prediction = const Prediction(
+      const prediction = Prediction(
         placeId: 'id3',
         description: 'Tokyo, Japan',
         matchedSubstrings: [],
@@ -72,8 +72,8 @@ void main() {
     });
 
     testWidgets('displays location icon', (WidgetTester tester) async {
-      final prediction =
-          const Prediction(placeId: 'id5', description: 'Test');
+      const prediction =
+          Prediction(placeId: 'id5', description: 'Test');
       await tester.pumpWidget(buildTile(prediction));
       expect(find.byIcon(Icons.location_on), findsOneWidget);
     });

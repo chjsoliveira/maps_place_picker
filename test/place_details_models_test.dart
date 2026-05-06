@@ -169,7 +169,7 @@ void main() {
     });
 
     test('constructs with all fields', () {
-      final geo = Geometry(location: Location(lat: 48.8566, lng: 2.3522));
+      final geo = const Geometry(location: Location(lat: 48.8566, lng: 2.3522));
       final details = PlaceDetails(
         placeId: 'pd2',
         name: 'Paris',
