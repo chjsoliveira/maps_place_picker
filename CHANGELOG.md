@@ -1,4 +1,4 @@
-## [1.0.2] - 06/May/2026
+## [1.0.2] - 10/Jul/2026
 
 ### Bug fixes
 
@@ -11,6 +11,22 @@
   practices. The non-deprecated `GoogleMap(style: ...)` constructor parameter
   continues to be the sole mechanism for applying the style — `setMapStyle()`
   is not used.
+
+### Dependencies
+
+- Upgraded `geolocator` to 14.0.3, `google_api_headers` to 5.3.4, and
+  `google_maps_flutter` to 2.17.1, along with their transitive plugin
+  implementations (`geolocator_android/apple/linux/web`,
+  `google_maps_flutter_android/ios/web`), via `flutter pub upgrade`.
+- Verified against Flutter 3.44.5 (stable channel); `flutter analyze` reports
+  no issues.
+
+### Docs / maintenance
+
+- Compressed `doc/preview.gif` from 6.2 MB to 2.6 MB (`fps=8`, scaled to
+  280px wide, 128-color palette via `ffmpeg`'s `palettegen`/`paletteuse`
+  filters) to satisfy pub.dev's 4 MB screenshot limit, which was blocking a
+  full pub score.
 
 ## [1.0.1] - 06/May/2026
 
