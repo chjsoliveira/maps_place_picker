@@ -1,3 +1,14 @@
+## [1.0.3] - 23/Jul/2026
+
+### Dependencies
+
+- Upgraded `google_maps_flutter` to 2.18.0 (and its platform interface/web
+  implementations, `google_maps_flutter_platform_interface` 2.16.0,
+  `google_maps_flutter_web` 0.6.3), `package_info_plus` to 10.2.1, and `uuid`
+  to 4.6.0, via `flutter pub upgrade`.
+- Verified with `flutter analyze` (no issues) and `flutter test` (173/173
+  passing) after the upgrade.
+
 ## [1.0.2] - 10/Jul/2026
 
 ### Bug fixes
