@@ -50,6 +50,20 @@ Widget _buildSearchWidget({
 // ──────────────────────────────────────────────────────────────────────────
 
 void main() {
+  group('PlacePicker – current location callback', () {
+    test('accepts and exposes onCurrentLocationResolved', () {
+      void callback(LatLng position) {}
+
+      final picker = PlacePicker(
+        apiKey: 'key',
+        initialPosition: const LatLng(0, 0),
+        onCurrentLocationResolved: callback,
+      );
+
+      expect(picker.onCurrentLocationResolved, same(callback));
+    });
+  });
+
   // ── F12 ────────────────────────────────────────────────────────────────
   group('F12 – PickResult geometry-only construction', () {
     test('PickResult can be constructed with only geometry', () {
@@ -175,6 +189,12 @@ void main() {
 
   // ── F7 ─────────────────────────────────────────────────────────────────
   group('F7 – SearchBarController.setText', () {
+    test('clearOverlay is safe before the search widget attaches', () {
+      final controller = SearchBarController();
+
+      expect(controller.clearOverlay, returnsNormally);
+    });
+
     testWidgets('setText sets the text and cursor at end', (tester) async {
       final appBarKey = GlobalKey();
       final controller = SearchBarController();

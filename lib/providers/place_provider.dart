@@ -75,7 +75,11 @@ class PlaceProvider extends ChangeNotifier {
   ///
   /// When [gracefully] is `true` any permission or service error is silently
   /// swallowed instead of propagating as a [Future.error].
-  Future<void> updateCurrentLocation({bool gracefully = false}) async {
+  /// [onResolved] is called only after a fresh position is obtained.
+  Future<void> updateCurrentLocation({
+    bool gracefully = false,
+    ValueChanged<Position>? onResolved,
+  }) async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -119,11 +123,13 @@ class PlaceProvider extends ChangeNotifier {
           'Location permissions are permanently denied, we cannot request permissions.');
     }
 
-    _currentPosition = await Geolocator.getCurrentPosition(
+    final position = await Geolocator.getCurrentPosition(
       locationSettings: LocationSettings(
         accuracy: desiredAccuracy ?? LocationAccuracy.best,
       ),
     );
+    _currentPosition = position;
+    onResolved?.call(position);
   }
 
   Position? _currentPosition;
