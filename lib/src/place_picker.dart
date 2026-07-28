@@ -65,6 +65,7 @@ class PlacePicker extends StatefulWidget {
     required this.initialPosition,
     this.useCurrentLocation,
     this.desiredLocationAccuracy = LocationAccuracy.high,
+    this.onCurrentLocationResolved,
     this.onMapCreated,
     this.hintText,
     this.searchingText,
@@ -140,6 +141,13 @@ class PlacePicker extends StatefulWidget {
 
   /// Desired GPS accuracy when fetching the current location.
   final LocationAccuracy desiredLocationAccuracy;
+
+  /// Called whenever the picker successfully resolves the device location.
+  ///
+  /// This is invoked after the initial lookup when [useCurrentLocation] is
+  /// `true` and after every successful tap on the "my location" button. It is
+  /// not invoked when location resolution fails or is gracefully skipped.
+  final ValueChanged<LatLng>? onCurrentLocationResolved;
 
   /// Hint text shown in the empty search field.
   final String? hintText;
@@ -487,7 +495,9 @@ class _PlacePickerState extends State<PlacePicker> {
     provider.setMapType(widget.initialMapType);
     if (widget.useCurrentLocation != null && widget.useCurrentLocation!) {
       await provider.updateCurrentLocation(
-          gracefully: widget.ignoreLocationPermissionErrors);
+        gracefully: widget.ignoreLocationPermissionErrors,
+        onResolved: _reportCurrentLocation,
+      );
     }
     if (widget.mapStyleAssetPath != null) {
       try {
@@ -503,6 +513,13 @@ class _PlacePickerState extends State<PlacePicker> {
       }
     }
     return provider;
+  }
+
+  void _reportCurrentLocation(Position position) {
+    if (!mounted) return;
+    widget.onCurrentLocationResolved?.call(
+      LatLng(position.latitude, position.longitude),
+    );
   }
 
   @override
@@ -745,7 +762,9 @@ class _PlacePickerState extends State<PlacePicker> {
             provider!.isOnUpdateLocationCooldown = false;
           });
           await provider!.updateCurrentLocation(
-              gracefully: widget.ignoreLocationPermissionErrors);
+            gracefully: widget.ignoreLocationPermissionErrors,
+            onResolved: _reportCurrentLocation,
+          );
           await _moveToCurrentPosition();
         }
       },

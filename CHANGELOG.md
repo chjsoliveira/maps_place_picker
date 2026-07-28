@@ -1,3 +1,17 @@
+## [1.0.4] - 28/Jul/2026
+
+### Features
+
+- Added `PlacePicker.onCurrentLocationResolved`, allowing consuming apps to
+  reuse the same device position resolved at startup and by the "my location"
+  button instead of performing a duplicate, potentially stale GPS lookup.
+
+### Bug fixes
+
+- Made `SearchBarController.clearOverlay()` a safe no-op before the search bar
+  attaches. Closing the picker during asynchronous location initialization
+  could previously call it too early and throw a `LateInitializationError`.
+
 ## [1.0.3] - 23/Jul/2026
 
 ### Dependencies

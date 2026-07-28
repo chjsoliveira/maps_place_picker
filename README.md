@@ -142,6 +142,9 @@ Navigator.push(
       apiKey: 'YOUR_GOOGLE_MAPS_API_KEY',
       initialPosition: LatLng(-33.8567844, 151.213108),
       useCurrentLocation: true,
+      onCurrentLocationResolved: (position) {
+        print('Current location: $position');
+      },
       onPlacePicked: (PickResult result) {
         print(result.formattedAddress);
         Navigator.of(context).pop();
@@ -162,6 +165,7 @@ See the `example/` directory for a complete demo application.
 | `onPlacePicked` | `ValueChanged<PickResult>?` | — | Callback when user confirms selection |
 | `useCurrentLocation` | `bool?` | `false` | Centre map on device location at startup |
 | `desiredLocationAccuracy` | `LocationAccuracy` | `high` | GPS accuracy for "my location" |
+| `onCurrentLocationResolved` | `ValueChanged<LatLng>?` | — | Called after each successful device-location resolution |
 | `hintText` | `String?` | `"Search here"` | Placeholder text in search bar |
 | `searchingText` | `String?` | `"Searching..."` | Text shown while searching |
 | `selectText` | `String?` | — | Label for the confirm button |
