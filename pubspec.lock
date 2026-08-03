@@ -204,18 +204,18 @@ packages:
     dependency: "direct main"
     description:
       name: google_api_headers
-      sha256: "0f42098c20d4f8cab6f3447fc4fbb03b2be82dca6d830f6c3828b957c53e6f21"
+      sha256: "7a160648c3a7d5d8eb5770b0bb04ff995af94c9cfedc2609b71c804b004c5aab"
       url: "https://pub.dev"
     source: hosted
-    version: "5.3.4"
+    version: "5.3.6"
   google_maps:
     dependency: transitive
     description:
       name: google_maps
-      sha256: "5d410c32112d7c6eb7858d359275b2aa04778eed3e36c745aeae905fb2fa6468"
+      sha256: "6811afff50dc410b860622ac89df125f5be1eada3ad69197e4c24dd18f2ef0e0"
       url: "https://pub.dev"
     source: hosted
-    version: "8.2.0"
+    version: "8.3.0"
   google_maps_flutter:
     dependency: "direct main"
     description:
@@ -543,4 +543,4 @@ packages:
     version: "6.6.1"
 sdks:
   dart: ">=3.12.2 <4.0.0"
-  flutter: ">=3.44.4"
+  flutter: ">=3.44.8"
