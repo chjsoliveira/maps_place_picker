@@ -1,3 +1,7 @@
+/// Shared [ChangeNotifier] state for [PlacePicker], exposing the Places and
+/// Geocoding service clients along with map/camera/search UI state.
+library;
+
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
