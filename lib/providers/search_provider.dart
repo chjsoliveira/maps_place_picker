@@ -1,9 +1,16 @@
+/// Lightweight [ChangeNotifier] state that tracks the text currently entered
+/// in the autocomplete search bar.
+library;
+
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 
 /// Lightweight provider that tracks the text currently entered in the
 /// autocomplete search bar.
 class SearchProvider extends ChangeNotifier {
+  /// Creates a [SearchProvider] with an empty search term.
+  SearchProvider();
+
   /// Returns the nearest [SearchProvider] ancestor from [context].
   static SearchProvider of(BuildContext context, {bool listen = true}) =>
       Provider.of<SearchProvider>(context, listen: listen);
