@@ -218,6 +218,151 @@ void main() {
     });
   });
 
+  // ────────────────── PlacesService.searchTextRankedByDistance ───────────
+
+  group('PlacesService.searchTextRankedByDistance', () {
+    test('returns predictions ordered as received, on 200 response',
+        () async {
+      final client = _mockClient(200, {
+        'places': [
+          {
+            'id': 'nearby-hall',
+            'displayName': {'text': 'Prefeitura de Paranavaí'},
+            'formattedAddress': 'Av. Gov. Parigot de Souza, Paranavaí - PR',
+            'location': {'latitude': -23.08, 'longitude': -52.46},
+            'types': ['city_hall'],
+          },
+          {
+            'id': 'far-hall',
+            'displayName': {'text': 'Prefeitura de São Paulo'},
+            'formattedAddress': 'Viaduto do Chá, São Paulo - SP',
+            'location': {'latitude': -23.55, 'longitude': -46.63},
+            'types': ['city_hall'],
+          },
+        ]
+      });
+
+      final service = PlacesService(apiKey: 'key', httpClient: client);
+      final response = await service.searchTextRankedByDistance(
+        'prefeitura',
+        latitude: -23.08,
+        longitude: -52.46,
+      );
+
+      expect(response.status, 'OK');
+      expect(response.predictions.length, 2);
+      // The client trusts the server's DISTANCE-ranked order verbatim.
+      expect(response.predictions[0].placeId, 'nearby-hall');
+      expect(response.predictions[0].description,
+          'Prefeitura de Paranavaí, Av. Gov. Parigot de Souza, Paranavaí - PR');
+      expect(response.predictions[0].structuredFormatting?.mainText,
+          'Prefeitura de Paranavaí');
+      expect(response.predictions[1].placeId, 'far-hall');
+    });
+
+    test('returns REQUEST_DENIED on 403 response', () async {
+      final client = _mockClient(403, {
+        'error': {'message': 'API key invalid', 'code': 403}
+      });
+
+      final service = PlacesService(apiKey: 'key', httpClient: client);
+      final response = await service.searchTextRankedByDistance(
+        'prefeitura',
+        latitude: 0.0,
+        longitude: 0.0,
+      );
+
+      expect(response.status, 'REQUEST_DENIED');
+      expect(response.errorMessage, contains('API key invalid'));
+      expect(response.predictions, isEmpty);
+    });
+
+    test('returns empty predictions when places list is empty', () async {
+      final client = _mockClient(200, {'places': []});
+
+      final service = PlacesService(apiKey: 'key', httpClient: client);
+      final response = await service.searchTextRankedByDistance(
+        'xyz',
+        latitude: 0.0,
+        longitude: 0.0,
+      );
+
+      expect(response.status, 'OK');
+      expect(response.predictions, isEmpty);
+    });
+
+    test('sends rankPreference DISTANCE and locationBias by default',
+        () async {
+      Map<String, dynamic>? capturedBody;
+      final client = MockClient((request) async {
+        capturedBody = jsonDecode(request.body) as Map<String, dynamic>;
+        return http.Response(jsonEncode({'places': []}), 200);
+      });
+
+      final service = PlacesService(apiKey: 'key', httpClient: client);
+      await service.searchTextRankedByDistance(
+        'prefeitura',
+        latitude: 10.0,
+        longitude: 20.0,
+        radius: 20000,
+        language: 'pt-BR',
+        region: 'BR',
+      );
+
+      expect(capturedBody!['textQuery'], 'prefeitura');
+      expect(capturedBody!['rankPreference'], 'DISTANCE');
+      expect(capturedBody!['languageCode'], 'pt-BR');
+      expect(capturedBody!['regionCode'], 'BR');
+      expect(capturedBody!.containsKey('locationBias'), isTrue);
+      expect(capturedBody!.containsKey('locationRestriction'), isFalse);
+
+      final circle =
+          (capturedBody!['locationBias'] as Map<String, dynamic>)['circle']
+              as Map<String, dynamic>;
+      final center = circle['center'] as Map<String, dynamic>;
+      expect(center['latitude'], 10.0);
+      expect(center['longitude'], 20.0);
+      expect(circle['radius'], 20000.0);
+    });
+
+    test('uses locationRestriction when strictbounds=true', () async {
+      Map<String, dynamic>? capturedBody;
+      final client = MockClient((request) async {
+        capturedBody = jsonDecode(request.body) as Map<String, dynamic>;
+        return http.Response(jsonEncode({'places': []}), 200);
+      });
+
+      final service = PlacesService(apiKey: 'key', httpClient: client);
+      await service.searchTextRankedByDistance(
+        'prefeitura',
+        latitude: 10.0,
+        longitude: 20.0,
+        strictbounds: true,
+      );
+
+      expect(capturedBody!.containsKey('locationRestriction'), isTrue);
+      expect(capturedBody!.containsKey('locationBias'), isFalse);
+    });
+
+    test('sends only the first type as includedType', () async {
+      Map<String, dynamic>? capturedBody;
+      final client = MockClient((request) async {
+        capturedBody = jsonDecode(request.body) as Map<String, dynamic>;
+        return http.Response(jsonEncode({'places': []}), 200);
+      });
+
+      final service = PlacesService(apiKey: 'key', httpClient: client);
+      await service.searchTextRankedByDistance(
+        'prefeitura',
+        latitude: 10.0,
+        longitude: 20.0,
+        types: ['city_hall', 'local_government_office'],
+      );
+
+      expect(capturedBody!['includedType'], 'city_hall');
+    });
+  });
+
   group('PlacesService.getDetailsByPlaceId', () {
     test('returns place details on 200 response', () async {
       final client = _mockClient(200, {

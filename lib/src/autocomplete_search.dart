@@ -42,7 +42,8 @@ class AutoCompleteSearch extends StatefulWidget {
       this.autocompleteOnTrailingWhitespace,
       this.voiceSearchEnabled = false,
       this.onVoiceSearchTapped,
-      this.geocodeOnTextFallback = false});
+      this.geocodeOnTextFallback = false,
+      this.rankByDistance = false});
 
   /// Session token used to group autocomplete and detail requests for billing.
   final String? sessionToken;
@@ -127,6 +128,20 @@ class AutoCompleteSearch extends StatefulWidget {
   /// one follows the same flow as a Places result (place-details fetch by
   /// Place ID). Defaults to `false`.
   final bool geocodeOnTextFallback;
+
+  /// When `true`, ranks results strictly by distance to the current device
+  /// position instead of Google's default text-relevance ranking.
+  ///
+  /// Plain Places Autocomplete only *biases* results toward
+  /// [autocompleteRadius]/[strictbounds] — it still ranks primarily by text
+  /// relevance and prominence, so a famous match far away can outrank a
+  /// closer one. When this is `true` (and the device position is known), the
+  /// search instead uses the Places API (New) Text Search endpoint with
+  /// `rankPreference: "DISTANCE"`, guaranteeing the nearest match comes first.
+  ///
+  /// Falls back to plain [PlacesService.autocomplete] when the device
+  /// position hasn't been resolved yet.
+  final bool rankByDistance;
 
   @override
   AutoCompleteSearchState createState() => AutoCompleteSearchState();
@@ -408,20 +423,36 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
     PlaceProvider provider = PlaceProvider.of(context, listen: false);
 
     if (searchTerm.isNotEmpty) {
-      final PlacesAutocompleteResponse response =
-          await provider.places.autocomplete(
-        searchTerm,
-        sessionToken: widget.sessionToken,
-        latitude: provider.currentPosition?.latitude,
-        longitude: provider.currentPosition?.longitude,
-        offset: widget.autocompleteOffset,
-        radius: widget.autocompleteRadius,
-        language: widget.autocompleteLanguage,
-        types: widget.autocompleteTypes ?? const [],
-        components: widget.autocompleteComponents ?? const [],
-        strictbounds: widget.strictbounds ?? false,
-        region: widget.region,
-      );
+      final double? latitude = provider.currentPosition?.latitude;
+      final double? longitude = provider.currentPosition?.longitude;
+
+      final PlacesAutocompleteResponse response;
+      if (widget.rankByDistance && latitude != null && longitude != null) {
+        response = await provider.places.searchTextRankedByDistance(
+          searchTerm,
+          latitude: latitude,
+          longitude: longitude,
+          radius: widget.autocompleteRadius,
+          language: widget.autocompleteLanguage,
+          types: widget.autocompleteTypes,
+          strictbounds: widget.strictbounds ?? false,
+          region: widget.region,
+        );
+      } else {
+        response = await provider.places.autocomplete(
+          searchTerm,
+          sessionToken: widget.sessionToken,
+          latitude: latitude,
+          longitude: longitude,
+          offset: widget.autocompleteOffset,
+          radius: widget.autocompleteRadius,
+          language: widget.autocompleteLanguage,
+          types: widget.autocompleteTypes ?? const [],
+          components: widget.autocompleteComponents ?? const [],
+          strictbounds: widget.strictbounds ?? false,
+          region: widget.region,
+        );
+      }
 
       if (response.errorMessage?.isNotEmpty == true ||
           response.status == "REQUEST_DENIED") {

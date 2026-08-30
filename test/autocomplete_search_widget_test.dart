@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:maps_place_picker/providers/place_provider.dart';
@@ -9,6 +10,21 @@ import 'package:maps_place_picker/src/autocomplete_search.dart';
 import 'package:maps_place_picker/src/controllers/autocomplete_search_controller.dart';
 import 'package:maps_place_picker/src/models/prediction.dart';
 import 'package:provider/provider.dart';
+
+/// Builds a [Position] with the given coordinates and dummy timing/accuracy
+/// fields, for tests that need [PlaceProvider.currentPosition] to be set.
+Position _positionAt(double latitude, double longitude) => Position(
+      latitude: latitude,
+      longitude: longitude,
+      timestamp: DateTime(2026),
+      accuracy: 1,
+      altitude: 0,
+      altitudeAccuracy: 1,
+      heading: 0,
+      headingAccuracy: 1,
+      speed: 0,
+      speedAccuracy: 1,
+    );
 
 // ─────────────────────────── helpers ──────────────────────────────────────
 
@@ -54,6 +70,7 @@ Widget _buildTestWidget({
   ValueChanged<Prediction>? onPicked,
   String? initialSearchString,
   bool searchForInitialValue = false,
+  bool rankByDistance = false,
 }) {
   return MaterialApp(
     home: ChangeNotifierProvider<PlaceProvider>.value(
@@ -73,6 +90,7 @@ Widget _buildTestWidget({
           searchForInitialValue: searchForInitialValue,
           // Provide explicit bool to avoid null-check crash on '!' in widget.
           autocompleteOnTrailingWhitespace: false,
+          rankByDistance: rankByDistance,
         ),
       ),
     ),
@@ -322,6 +340,78 @@ void main() {
 
       // Overlay should be gone.
       expect(find.text('São Paulo, Brazil'), findsNothing);
+    });
+  });
+
+  group('AutoCompleteSearch – rankByDistance', () {
+    testWidgets(
+        'uses the Text Search endpoint instead of autocomplete when the '
+        'device position is known', (tester) async {
+      final appBarKey = GlobalKey();
+      final controller = SearchBarController();
+      String? calledPath;
+
+      final client = MockClient((request) async {
+        calledPath = request.url.path;
+        return http.Response(
+          jsonEncode({
+            'places': [
+              {
+                'id': 'nearby-hall',
+                'displayName': {'text': 'Prefeitura de Paranavaí'},
+                'formattedAddress': 'Paranavaí - PR',
+              },
+            ]
+          }),
+          200,
+        );
+      });
+
+      final placeProvider = PlaceProvider('key', null, client, const {});
+      placeProvider.currentPosition = _positionAt(-23.08, -52.46);
+
+      await tester.pumpWidget(_buildTestWidget(
+        appBarKey: appBarKey,
+        controller: controller,
+        placeProvider: placeProvider,
+        rankByDistance: true,
+      ));
+
+      await tester.enterText(find.byType(TextField), 'prefeitura');
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(calledPath, contains('searchText'));
+      expect(find.textContaining('Prefeitura de Paranavaí'), findsWidgets);
+    });
+
+    testWidgets(
+        'falls back to autocomplete when the device position is unknown',
+        (tester) async {
+      final appBarKey = GlobalKey();
+      final controller = SearchBarController();
+      String? calledPath;
+
+      final client = MockClient((request) async {
+        calledPath = request.url.path;
+        return http.Response(jsonEncode({'suggestions': []}), 200);
+      });
+
+      final placeProvider = PlaceProvider('key', null, client, const {});
+      // currentPosition intentionally left unset.
+
+      await tester.pumpWidget(_buildTestWidget(
+        appBarKey: appBarKey,
+        controller: controller,
+        placeProvider: placeProvider,
+        rankByDistance: true,
+      ));
+
+      await tester.enterText(find.byType(TextField), 'prefeitura');
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(milliseconds: 500));
+
+      expect(calledPath, contains('autocomplete'));
     });
   });
 }

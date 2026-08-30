@@ -128,6 +128,7 @@ class PlacePicker extends StatefulWidget {
     this.geocodeOnTextFallback = false,
     this.confirmAddressMinDistance,
     this.addressUnavailableText,
+    this.rankAutocompleteByDistance = false,
   });
 
   /// Google Maps API key used for Places and Geocoding requests.
@@ -452,6 +453,16 @@ class PlacePicker extends StatefulWidget {
   /// Useful for translating the picker into languages other than English.
   final String? addressUnavailableText;
 
+  /// When `true`, ranks autocomplete results strictly by distance to the
+  /// current device position (Places API Text Search `rankPreference:
+  /// "DISTANCE"`) instead of Google's default text-relevance ranking.
+  ///
+  /// Plain autocomplete only biases results toward [autocompleteRadius]; a
+  /// famous match far away can still outrank a closer one. Use this when the
+  /// nearest match matters more than predictive text completion. Falls back
+  /// to plain autocomplete when the device position hasn't been resolved yet.
+  final bool rankAutocompleteByDistance;
+
   @override
   State<PlacePicker> createState() => _PlacePickerState();
 }
@@ -640,6 +651,7 @@ class _PlacePickerState extends State<PlacePicker> {
               autocompleteTypes: widget.autocompleteTypes,
               strictbounds: widget.strictbounds,
               region: widget.region,
+              rankByDistance: widget.rankAutocompleteByDistance,
               initialSearchString: widget.initialSearchString,
               searchForInitialValue: widget.searchForInitialValue,
               autocompleteOnTrailingWhitespace:

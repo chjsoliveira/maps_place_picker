@@ -337,6 +337,136 @@ class PlacesService {
     }
   }
 
+  // ────────────────────── Text Search (ranked by distance) ───────────────
+
+  /// Searches for places matching [textQuery], ranked strictly by distance to
+  /// [latitude]/[longitude] using the Places API (New) Text Search endpoint
+  /// (`rankPreference: "DISTANCE"`).
+  ///
+  /// Unlike [autocomplete], which only *biases* results toward a location
+  /// while ranking them primarily by text relevance/prominence, this endpoint
+  /// asks Google to sort the results by actual distance from the given point.
+  /// It also returns each place's `location`, so the nearest genuine match
+  /// (e.g. the closest "prefeitura" rather than the most famous one) is
+  /// always first — something plain Autocomplete cannot guarantee.
+  ///
+  /// [radius] sizes the bias/restriction circle in metres (default 20000).
+  /// [strictbounds] switches the circle from `locationBias` (soft) to
+  /// `locationRestriction` (hard boundary), same semantics as [autocomplete].
+  /// [types] – when provided, only the first entry is sent as
+  /// `includedType`, since Text Search (New) accepts a single type.
+  Future<PlacesAutocompleteResponse> searchTextRankedByDistance(
+    String textQuery, {
+    required double latitude,
+    required double longitude,
+    num? radius,
+    String? language,
+    List<String>? types,
+    bool strictbounds = false,
+    String? region,
+  }) async {
+    try {
+      final circle = {
+        'circle': {
+          'center': {'latitude': latitude, 'longitude': longitude},
+          'radius': (radius ?? 20000).toDouble(),
+        },
+      };
+
+      final body = <String, dynamic>{
+        'textQuery': textQuery,
+        'rankPreference': 'DISTANCE',
+        if (strictbounds)
+          'locationRestriction': circle
+        else
+          'locationBias': circle,
+        if (language != null) 'languageCode': language,
+        if (region != null) 'regionCode': region,
+        if (types != null && types.isNotEmpty) 'includedType': types.first,
+      };
+
+      const fieldMask =
+          'places.id,'
+          'places.displayName,'
+          'places.formattedAddress,'
+          'places.location,'
+          'places.types';
+
+      final uri = Uri.parse('$_base/v1/places:searchText');
+      final response = await _client.post(
+        uri,
+        headers: _headers(fieldMask: fieldMask),
+        body: jsonEncode(body),
+      );
+
+      return _parseSearchTextResponse(response);
+    } catch (e) {
+      return PlacesAutocompleteResponse(
+        status: 'NETWORK_ERROR',
+        predictions: const [],
+        errorMessage: e.toString(),
+      );
+    }
+  }
+
+  PlacesAutocompleteResponse _parseSearchTextResponse(
+      http.Response response) {
+    if (response.statusCode != 200) {
+      String? errorMsg;
+      try {
+        final body = jsonDecode(response.body) as Map<String, dynamic>;
+        errorMsg =
+            (body['error'] as Map<String, dynamic>?)?['message'] as String?;
+      } catch (_) {}
+      return PlacesAutocompleteResponse(
+        status: 'REQUEST_DENIED',
+        predictions: const [],
+        errorMessage: errorMsg ?? 'HTTP ${response.statusCode}',
+      );
+    }
+
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    final places = body['places'] as List<dynamic>? ?? const [];
+
+    final predictions = places
+        .map((p) {
+          final place = p as Map<String, dynamic>;
+          final id = place['id'] as String?;
+          if (id == null) return null;
+          final displayName =
+              (place['displayName'] as Map<String, dynamic>?)?['text']
+                  as String?;
+          final formattedAddress = place['formattedAddress'] as String?;
+          final description = [displayName, formattedAddress]
+              .whereType<String>()
+              .where((s) => s.isNotEmpty)
+              .join(', ');
+          return Prediction(
+            placeId: id,
+            description: description.isNotEmpty
+                ? description
+                : (displayName ?? formattedAddress),
+            structuredFormatting: displayName != null
+                ? StructuredFormatting(
+                    mainText: displayName,
+                    secondaryText: formattedAddress,
+                  )
+                : null,
+            types: (place['types'] as List<dynamic>?)
+                    ?.map((e) => e as String)
+                    .toList() ??
+                const [],
+          );
+        })
+        .whereType<Prediction>()
+        .toList();
+
+    return PlacesAutocompleteResponse(
+      status: 'OK',
+      predictions: predictions,
+    );
+  }
+
   PlacesAutocompleteResponse _parseNearbySearchResponse(
       http.Response response) {
     if (response.statusCode != 200) {
