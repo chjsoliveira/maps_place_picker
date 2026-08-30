@@ -24,3 +24,5 @@ export 'src/components/floating_card.dart';
 export 'src/components/rounded_frame.dart';
 export 'src/models/circle_area.dart';
 export 'src/place_picker.dart';
+export 'src/google_map_place_picker.dart'
+    show SelectedPlaceWidgetBuilder, PinBuilder;
