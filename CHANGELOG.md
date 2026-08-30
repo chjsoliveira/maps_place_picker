@@ -1,7 +1,10 @@
-## [1.0.5] - 30/Aug/2026
+## [1.0.4] - 28/Jul/2026
 
 ### Features
 
+- Added `PlacePicker.onCurrentLocationResolved`, allowing consuming apps to
+  reuse the same device position resolved at startup and by the "my location"
+  button instead of performing a duplicate, potentially stale GPS lookup.
 - **`PlacePicker.rankAutocompleteByDistance`** — when `true`, search results
   are ranked strictly by distance to the current device position instead of
   Google's default text-relevance ranking. Plain Places Autocomplete only
@@ -14,14 +17,6 @@
   automatically when the device position hasn't been resolved yet.
 - Added `PlacesService.searchTextRankedByDistance` — the new Text Search
   (New) client method backing the feature above.
-
-## [1.0.4] - 28/Jul/2026
-
-### Features
-
-- Added `PlacePicker.onCurrentLocationResolved`, allowing consuming apps to
-  reuse the same device position resolved at startup and by the "my location"
-  button instead of performing a duplicate, potentially stale GPS lookup.
 
 ### Bug fixes
 
