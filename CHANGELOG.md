@@ -1,3 +1,20 @@
+## [1.0.5] - 30/Aug/2026
+
+### Features
+
+- **`PlacePicker.rankAutocompleteByDistance`** — when `true`, search results
+  are ranked strictly by distance to the current device position instead of
+  Google's default text-relevance ranking. Plain Places Autocomplete only
+  *biases* results toward `autocompleteRadius`; a well-known match far away
+  could still outrank one right next to the user (e.g. typing "prefeitura"
+  surfacing a famous city hall in another city before the one 2 km away).
+  Internally this switches the search to the Places API (New) Text Search
+  endpoint (`places:searchText`) with `rankPreference: "DISTANCE"`, which
+  also returns each place's `location`. Falls back to plain autocomplete
+  automatically when the device position hasn't been resolved yet.
+- Added `PlacesService.searchTextRankedByDistance` — the new Text Search
+  (New) client method backing the feature above.
+
 ## [1.0.4] - 28/Jul/2026
 
 ### Features

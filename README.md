@@ -181,6 +181,7 @@ See the `example/` directory for a complete demo application.
 | `autocompleteRadius` | `num?` | — | Search radius in metres |
 | `autocompleteOffset` | `num?` | — | Character offset for autocomplete |
 | `strictbounds` | `bool?` | — | Restrict results to the autocomplete radius |
+| `rankAutocompleteByDistance` | `bool` | `false` | Rank results strictly by distance to the device position (Text Search `rankPreference: DISTANCE`) instead of text relevance |
 | `region` | `String?` | — | Region bias for search results (ISO 3166-1 alpha-2 country code, e.g. `"US"`, `"BR"`) |
 | `pickArea` | `CircleArea?` | — | Restrict valid picks to a circle |
 | `enableMapTypeButton` | `bool` | `true` | Show the map-type toggle button |
