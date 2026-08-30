@@ -20,6 +20,14 @@
 
 ### Bug fixes
 
+- Exported `SelectedPlaceWidgetBuilder` and `PinBuilder` from the package's
+  main library. Both were already accepted as parameter types by `PlacePicker`
+  (`selectedPlaceWidgetBuilder`, `pinBuilder`), but consumers had no public way
+  to name those types for their own builder functions — only a `src/`-internal
+  import could reach them.
+
+### Bug fixes
+
 - Made `SearchBarController.clearOverlay()` a safe no-op before the search bar
   attaches. Closing the picker during asynchronous location initialization
   could previously call it too early and throw a `LateInitializationError`.
