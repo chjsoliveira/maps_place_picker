@@ -5,10 +5,20 @@ import 'package:maps_place_picker/src/models/geocoding_result.dart';
 
 const _geocodingBaseUrl = 'https://maps.googleapis.com';
 
+/// Geocoding operations used by [PlacePicker].
+abstract class GeocodingDataSource {
+  /// Reverse-geocodes [latitude] and [longitude].
+  Future<GeocodingResponse> searchByLocation(double latitude, double longitude,
+      {String? language});
+
+  /// Forward-geocodes [address].
+  Future<GeocodingResponse> searchByAddress(String address, {String? language});
+}
+
 /// A lightweight HTTP client for the **Geocoding API**.
 ///
 /// Used for reverse-geocoding the map camera position.
-class GeocodingService {
+class GeocodingService implements GeocodingDataSource {
   /// Creates a [GeocodingService].
   ///
   /// [apiKey] is required. [baseUrl] sets an optional proxy host. [httpClient]
@@ -36,6 +46,7 @@ class GeocodingService {
       : _geocodingBaseUrl;
 
   /// Reverse-geocodes [latitude] / [longitude] using the Geocoding API.
+  @override
   Future<GeocodingResponse> searchByLocation(
     double latitude,
     double longitude, {
@@ -74,6 +85,7 @@ class GeocodingService {
   /// Returns a [GeocodingResponse] whose [GeocodingResponse.results] can be
   /// converted to [Prediction]s for display when the Places Autocomplete API
   /// returns no suggestions (see `geocodeOnTextFallback`).
+  @override
   Future<GeocodingResponse> searchByAddress(
     String address, {
     String? language,
