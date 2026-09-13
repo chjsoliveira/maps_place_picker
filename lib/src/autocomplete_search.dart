@@ -430,6 +430,7 @@ class AutoCompleteSearchState extends State<AutoCompleteSearch> {
       if (widget.rankByDistance && latitude != null && longitude != null) {
         response = await provider.places.searchTextRankedByDistance(
           searchTerm,
+          sessionToken: widget.sessionToken,
           latitude: latitude,
           longitude: longitude,
           radius: widget.autocompleteRadius,

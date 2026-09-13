@@ -1,3 +1,18 @@
+## [1.1.0] - 13/Sep/2026
+
+### Features
+
+- Added callback-backed Places search/details and reverse/forward geocoding
+  data sources so host apps can use their own authenticated endpoints,
+  caching, and map providers without imitating Google's HTTP API shape.
+- Added `PlacesDataSource` and `GeocodingDataSource` abstractions so the picker
+  can retain its existing HTTP behavior while accepting callback-backed
+  implementations, and exported the callback types plus the result models
+  needed to construct callback responses.
+- Forwarded the picker session token to callback-backed distance-ranked
+  searches and exported `Geometry`/`Location`, allowing consumers to use the
+  callback API entirely through the package's public entrypoint.
+
 ## [1.0.4] - 28/Jul/2026
 
 ### Features

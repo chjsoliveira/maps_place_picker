@@ -20,9 +20,17 @@ library;
 
 export 'src/models/pick_result.dart';
 export 'src/models/component.dart';
+export 'src/models/prediction.dart';
+export 'src/models/geocoding_result.dart';
+export 'src/models/place_details.dart';
+export 'src/models/geometry.dart';
 export 'src/components/floating_card.dart';
 export 'src/components/rounded_frame.dart';
 export 'src/models/circle_area.dart';
 export 'src/place_picker.dart';
 export 'src/google_map_place_picker.dart'
     show SelectedPlaceWidgetBuilder, PinBuilder;
+export 'src/services/places_service.dart' show PlacesDataSource;
+export 'src/services/geocoding_service.dart' show GeocodingDataSource;
+export 'src/services/callback_places_service.dart';
+export 'src/services/callback_geocoding_service.dart';

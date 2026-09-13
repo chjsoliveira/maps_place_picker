@@ -32,20 +32,24 @@ class PlaceProvider extends ChangeNotifier {
     String apiKey,
     String? proxyBaseUrl,
     Client? httpClient,
-    Map<String, dynamic> apiHeaders,
-  ) {
-    places = PlacesService(
-      apiKey: apiKey,
-      baseUrl: proxyBaseUrl,
-      httpClient: httpClient,
-      apiHeaders: apiHeaders.cast<String, String>(),
-    );
-    geocoding = GeocodingService(
-      apiKey: apiKey,
-      baseUrl: proxyBaseUrl,
-      httpClient: httpClient,
-      apiHeaders: apiHeaders.cast<String, String>(),
-    );
+    Map<String, dynamic> apiHeaders, {
+    PlacesDataSource? placesDataSource,
+    GeocodingDataSource? geocodingDataSource,
+  }) {
+    places = placesDataSource ??
+        PlacesService(
+          apiKey: apiKey,
+          baseUrl: proxyBaseUrl,
+          httpClient: httpClient,
+          apiHeaders: apiHeaders.cast<String, String>(),
+        );
+    geocoding = geocodingDataSource ??
+        GeocodingService(
+          apiKey: apiKey,
+          baseUrl: proxyBaseUrl,
+          httpClient: httpClient,
+          apiHeaders: apiHeaders.cast<String, String>(),
+        );
   }
 
   /// Returns the nearest [PlaceProvider] ancestor from [context].
@@ -54,10 +58,10 @@ class PlaceProvider extends ChangeNotifier {
 
   /// The Places API (New) service used for autocomplete and place-detail
   /// lookups.
-  late PlacesService places;
+  late PlacesDataSource places;
 
   /// The Geocoding API service used for reverse-geocoding the camera position.
-  late GeocodingService geocoding;
+  late GeocodingDataSource geocoding;
 
   /// Session token used to group autocomplete queries and detail fetches into
   /// a single billable session.

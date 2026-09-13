@@ -10,6 +10,8 @@ import 'package:maps_place_picker/src/autocomplete_search.dart';
 import 'package:maps_place_picker/src/controllers/autocomplete_search_controller.dart';
 import 'package:maps_place_picker/src/google_map_place_picker.dart';
 import 'package:maps_place_picker/src/models/prediction.dart';
+import 'package:maps_place_picker/src/services/callback_geocoding_service.dart';
+import 'package:maps_place_picker/src/services/callback_places_service.dart';
 import 'package:maps_place_picker/src/services/places_service.dart';
 import 'package:http/http.dart';
 import 'package:provider/provider.dart';
@@ -129,7 +131,14 @@ class PlacePicker extends StatefulWidget {
     this.confirmAddressMinDistance,
     this.addressUnavailableText,
     this.rankAutocompleteByDistance = false,
-  });
+    this.placesSearchCallback,
+    this.placeDetailsCallback,
+    this.reverseGeocodeCallback,
+    this.forwardGeocodeCallback,
+  }) : assert(
+          (placesSearchCallback == null) == (placeDetailsCallback == null),
+          'placesSearchCallback and placeDetailsCallback must be provided together.',
+        );
 
   /// Google Maps API key used for Places and Geocoding requests.
   final String apiKey;
@@ -463,6 +472,19 @@ class PlacePicker extends StatefulWidget {
   /// to plain autocomplete when the device position hasn't been resolved yet.
   final bool rankAutocompleteByDistance;
 
+  /// Routes autocomplete and distance-ranked search through the host app.
+  /// Must be supplied together with [placeDetailsCallback].
+  final PlacesSearchFetcher? placesSearchCallback;
+
+  /// Routes place-details lookup through the host app.
+  final PlaceDetailsFetcher? placeDetailsCallback;
+
+  /// Routes reverse geocoding through the host app.
+  final ReverseGeocodeFetcher? reverseGeocodeCallback;
+
+  /// Optionally routes the forward-geocoding fallback through the host app.
+  final ForwardGeocodeFetcher? forwardGeocodeCallback;
+
   @override
   State<PlacePicker> createState() => _PlacePickerState();
 }
@@ -494,11 +516,27 @@ class _PlacePickerState extends State<PlacePicker> {
   Future<PlaceProvider> _initPlaceProvider() async {
     final assetBundle = DefaultAssetBundle.of(context);
     final headers = await const GoogleApiHeaders().getHeaders();
+    final placesSearchCallback = widget.placesSearchCallback;
+    final placeDetailsCallback = widget.placeDetailsCallback;
+    final reverseGeocodeCallback = widget.reverseGeocodeCallback;
     final provider = PlaceProvider(
       widget.apiKey,
       widget.proxyBaseUrl,
       widget.httpClient,
       headers,
+      placesDataSource:
+          placesSearchCallback != null && placeDetailsCallback != null
+              ? CallbackPlacesService(
+                  searchFetcher: placesSearchCallback,
+                  detailsFetcher: placeDetailsCallback,
+                )
+              : null,
+      geocodingDataSource: reverseGeocodeCallback != null
+          ? CallbackGeocodingService(
+              reverseGeocodeFetcher: reverseGeocodeCallback,
+              forwardGeocodeFetcher: widget.forwardGeocodeCallback,
+            )
+          : null,
     );
     provider.sessionToken = widget.sessionToken ?? const Uuid().v4();
     widget.onSessionTokenCreated?.call(provider.sessionToken!);

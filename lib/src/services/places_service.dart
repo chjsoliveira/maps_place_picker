@@ -54,6 +54,42 @@ class PlacesDetailsResponse {
   bool get isOk => status == 'OK';
 }
 
+/// Places operations used by [PlacePicker].
+abstract class PlacesDataSource {
+  /// Fetches autocomplete predictions for [input].
+  Future<PlacesAutocompleteResponse> autocomplete(String input,
+      {String? sessionToken,
+      double? latitude,
+      double? longitude,
+      num? radius,
+      String? language,
+      List<String>? types,
+      List<Component>? components,
+      bool strictbounds = false,
+      String? region,
+      num? offset});
+
+  /// Searches for places matching [textQuery], ranked by distance.
+  ///
+  /// [sessionToken] lets callback-backed implementations keep ranked searches
+  /// in the same picker session. The Google Text Search implementation does
+  /// not send it because that endpoint has no session-token field.
+  Future<PlacesAutocompleteResponse> searchTextRankedByDistance(
+      String textQuery,
+      {String? sessionToken,
+      required double latitude,
+      required double longitude,
+      num? radius,
+      String? language,
+      List<String>? types,
+      bool strictbounds = false,
+      String? region});
+
+  /// Fetches details for [placeId].
+  Future<PlacesDetailsResponse> getDetailsByPlaceId(String placeId,
+      {String? sessionToken, String? language});
+}
+
 /// A lightweight HTTP client for the **Places API (New)**.
 ///
 /// Replaces the unmaintained `flutter_google_maps_webservices` package.
@@ -61,7 +97,7 @@ class PlacesDetailsResponse {
 /// Supported operations:
 /// - [autocomplete] – Places Autocomplete (New)
 /// - [getDetailsByPlaceId] – Place Details (New)
-class PlacesService {
+class PlacesService implements PlacesDataSource {
   /// Creates a [PlacesService].
   ///
   /// [apiKey] is required. [baseUrl] sets an optional proxy host. [httpClient]
@@ -106,6 +142,7 @@ class PlacesService {
   /// [region] – a CLDR two-character region code used to bias results (fixes
   /// upstream issue B12 – previously passed but had no effect in v1; now
   /// maps to `regionCode` in the New API).
+  @override
   Future<PlacesAutocompleteResponse> autocomplete(
     String input, {
     String? sessionToken,
@@ -241,6 +278,7 @@ class PlacesService {
       'types';
 
   /// Fetches full place details for [placeId].
+  @override
   Future<PlacesDetailsResponse> getDetailsByPlaceId(
     String placeId, {
     String? sessionToken,
@@ -355,8 +393,10 @@ class PlacesService {
   /// `locationRestriction` (hard boundary), same semantics as [autocomplete].
   /// [types] – when provided, only the first entry is sent as
   /// `includedType`, since Text Search (New) accepts a single type.
+  @override
   Future<PlacesAutocompleteResponse> searchTextRankedByDistance(
     String textQuery, {
+    String? sessionToken,
     required double latitude,
     required double longitude,
     num? radius,
